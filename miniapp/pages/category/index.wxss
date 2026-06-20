@@ -1,0 +1,70 @@
+/* pages/category/index.wxss */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.header {
+  padding: 48rpx 32rpx 32rpx;
+  background: linear-gradient(135deg, #1f5fa8, #0e3d75);
+}
+
+.title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.module-list {
+  padding: 24rpx 32rpx;
+}
+
+.module-card {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  margin-bottom: 20rpx;
+}
+
+.module-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.icon-emoji {
+  font-size: 44rpx;
+}
+
+.module-info {
+  flex: 1;
+}
+
+.module-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8rpx;
+}
+
+.module-desc {
+  font-size: 24rpx;
+}
+
+.arrow {
+  color: var(--color-text-tertiary);
+  font-size: 28rpx;
+}

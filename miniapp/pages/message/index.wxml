@@ -1,0 +1,33 @@
+<!--pages/message/index.wxml-->
+<view class="page">
+  <view class="message-list">
+    <view
+      class="message-item card"
+      wx:for="{{messages}}"
+      wx:key="id"
+      bind:tap="onMessageTap"
+      data-item="{{item}}"
+    >
+      <view class="msg-icon">
+        <text wx:if="{{item.type === 'SYSTEM'}}">📢</text>
+        <text wx:elif="{{item.type === 'ORDER'}}">📦</text>
+        <text wx:else>💬</text>
+      </view>
+      <view class="msg-content">
+        <text class="msg-title">{{item.title}}</text>
+        <text class="msg-text text-ellipsis text-tertiary">{{item.content}}</text>
+        <text class="msg-time text-tertiary">{{item.createdAt}}</text>
+      </view>
+      <view wx:if="{{!item.isRead}}" class="unread-dot"></view>
+    </view>
+
+    <view wx:if="{{messages.length === 0 && !loading}}" class="empty-tip">
+      <text class="empty-icon">🔔</text>
+      <text class="text-tertiary">暂无消息</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-tip">
+      <text class="text-tertiary">加载中...</text>
+    </view>
+  </view>
+</view>

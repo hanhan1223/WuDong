@@ -1,0 +1,26 @@
+<!--pages/dining/list.wxml-->
+<view class="page">
+  <view class="section-title">苗家特色餐厅</view>
+  <view class="restaurant-list">
+    <view
+      class="restaurant-card card"
+      wx:for="{{restaurants}}"
+      wx:key="id"
+      bind:tap="onRestaurantTap"
+      data-id="{{item.id}}"
+    >
+      <image class="restaurant-img" src="{{item.mainImage}}" mode="aspectFill" />
+      <view class="restaurant-info">
+        <text class="restaurant-name">{{item.name}}</text>
+        <view class="restaurant-meta">
+          <text class="rating">⭐ {{item.rating}}</text>
+          <text class="capacity text-tertiary">容纳{{item.capacity}}人</text>
+        </view>
+        <text class="restaurant-addr text-ellipsis text-tertiary">📍 {{item.address}}</text>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{loading}}" class="loading-tip">
+    <text class="text-tertiary">加载中...</text>
+  </view>
+</view>

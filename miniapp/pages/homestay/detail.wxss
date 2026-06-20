@@ -1,0 +1,168 @@
+/* pages/homestay/detail.wxss */
+.page {
+  padding-bottom: 120rpx;
+  background: var(--color-bg);
+}
+
+.cover-swiper {
+  height: 500rpx;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  margin-top: -20rpx;
+  border-radius: 24rpx 24rpx 0 0;
+  position: relative;
+  z-index: 1;
+}
+
+.name {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.meta {
+  display: flex;
+  gap: 24rpx;
+  font-size: 26rpx;
+  margin-bottom: 12rpx;
+}
+
+.rating {
+  color: var(--color-gold);
+}
+
+.intro {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.section {
+  margin-top: 16rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.facility-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.room-item {
+  display: flex;
+  padding: 20rpx;
+  border: 2rpx solid var(--color-border);
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.room-item.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.room-img {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.room-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.room-name {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.room-meta {
+  font-size: 24rpx;
+}
+
+/* 表单 */
+.form-item {
+  margin-bottom: 20rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 8rpx;
+}
+
+.form-input {
+  padding: 16rpx 24rpx;
+  background: var(--color-bg);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+/* 底部 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.bottom-info {
+  flex: 1;
+}
+
+.bottom-price {
+  font-size: 26rpx;
+  color: var(--color-orange);
+}
+
+.bottom-price .big {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.book-btn {
+  width: 240rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 999rpx;
+  border: none;
+}
+
+.book-btn::after {
+  border: none;
+}

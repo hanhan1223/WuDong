@@ -1,0 +1,80 @@
+<!--pages/community/index.wxml-->
+<view class="page">
+  <!-- 排序切换 -->
+  <view class="sort-bar">
+    <view
+      class="sort-item {{sort === 'recommend' ? 'active' : ''}}"
+      bind:tap="onSortChange"
+      data-sort="recommend"
+    >
+      推荐
+    </view>
+    <view
+      class="sort-item {{sort === 'latest' ? 'active' : ''}}"
+      bind:tap="onSortChange"
+      data-sort="latest"
+    >
+      最新
+    </view>
+  </view>
+
+  <!-- 游记列表 -->
+  <view class="post-list">
+    <view
+      class="post-card card"
+      wx:for="{{posts}}"
+      wx:key="id"
+      bind:tap="onPostTap"
+      data-id="{{item.id}}"
+    >
+      <view class="post-header">
+        <image class="post-avatar" src="{{item.user.avatar}}" mode="aspectFill" />
+        <view class="post-user">
+          <text class="post-nickname">{{item.user.nickname}}</text>
+          <text class="post-time text-tertiary">{{item.createdAt}}</text>
+        </view>
+      </view>
+
+      <text class="post-title">{{item.title}}</text>
+      <text class="post-content text-ellipsis2">{{item.content}}</text>
+
+      <!-- 图片网格 -->
+      <view class="post-images" wx:if="{{item.images && item.images.length > 0}}">
+        <image
+          class="post-image {{item.images.length === 1 ? 'single' : ''}}"
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:key="*this"
+          src="{{img}}"
+          mode="aspectFill"
+        />
+      </view>
+
+      <!-- 互动栏 -->
+      <view class="post-actions">
+        <view class="action-item">
+          <text>❤️ {{item.likeCount || 0}}</text>
+        </view>
+        <view class="action-item">
+          <text>💬 {{item.commentCount || 0}}</text>
+        </view>
+        <view class="action-item">
+          <text>⭐ {{item.favoriteCount || 0}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{posts.length === 0 && !loading}}" class="empty-tip">
+      <text class="text-tertiary">暂无游记</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-tip">
+      <text class="text-tertiary">加载中...</text>
+    </view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="publish-btn" bind:tap="onPublish">
+    <text>✏️</text>
+  </view>
+</view>

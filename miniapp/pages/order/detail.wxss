@@ -1,0 +1,157 @@
+/* pages/order/detail.wxss */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding-bottom: 120rpx;
+}
+
+.status-bar {
+  padding: 40rpx 32rpx;
+  background: linear-gradient(135deg, #1f5fa8, #0e3d75);
+}
+
+.status-bar.PENDING_PAYMENT {
+  background: linear-gradient(135deg, #faad14, #d48806);
+}
+
+.status-bar.COMPLETED {
+  background: linear-gradient(135deg, #52c41a, #389e0d);
+}
+
+.status-bar.CANCELLED,
+.status-bar.REFUNDED {
+  background: linear-gradient(135deg, #8c8c8c, #595959);
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+.section {
+  margin: 16rpx 32rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.info-value {
+  font-size: 26rpx;
+}
+
+.total-row {
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--color-border);
+  margin-top: 8rpx;
+}
+
+.total-price {
+  font-size: 32rpx;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.item-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 8rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.item-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.item-name {
+  display: block;
+  font-size: 28rpx;
+  margin-bottom: 4rpx;
+}
+
+.item-spec {
+  font-size: 24rpx;
+}
+
+.item-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.item-price {
+  display: block;
+  font-size: 28rpx;
+}
+
+.item-qty {
+  font-size: 24rpx;
+}
+
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 32rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border: 2rpx solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  background: #fff;
+  padding: 0;
+}
+
+.btn-cancel::after {
+  border: none;
+}
+
+.btn-pay {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  border: none;
+  padding: 0;
+}
+
+.btn-pay::after {
+  border: none;
+}

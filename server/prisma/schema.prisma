@@ -1,0 +1,1114 @@
+// ============================================================
+// 乌东文旅"衣食住行"综合服务平台 - Prisma Schema
+// 数据库: MySQL 8.0+ | 字符集: utf8mb4
+// ============================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 公共模块 - 用户体系 & 系统管理
+// ============================================================
+
+/// 用户表 - 所有模块共用
+model User {
+  id           Int       @id @default(autoincrement())
+  phone        String    @unique @db.VarChar(20)
+  password     String    @db.VarChar(255)
+  nickname     String    @db.VarChar(50)
+  avatar       String?   @db.VarChar(500)
+  gender       Int       @default(0) // 0-未知 1-男 2-女
+  region       String?   @db.VarChar(100)
+  bio          String?   @db.VarChar(500)
+  role         UserRole  @default(TOURIST)
+  status       UserStatus @default(ACTIVE)
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // 关联
+  merchant              Merchant?
+  merchantApplications  MerchantApplication[]
+  orders                Order[]
+  cartItems             CartItem[]
+  favorites             Favorite[]
+  reviews               Review[]
+  posts                 Post[]
+  comments              Comment[]
+  likes                 Like[]
+  follows               Follow[]      @relation("following")
+  followers             Follow[]      @relation("follower")
+  messages              Message[]
+  addresses             Address[]
+  reports               Report[]      @relation("reporter")
+  searchHistory         SearchHistory[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  TOURIST   // 游客
+  MERCHANT  // 商家
+  ADMIN     // 管理员
+}
+
+enum UserStatus {
+  ACTIVE    // 正常
+  DISABLED  // 禁用
+  MUTED     // 禁言
+}
+
+/// 商家表
+model Merchant {
+  id           Int           @id @default(autoincrement())
+  userId       Int           @unique @map("user_id")
+  shopName     String        @db.VarChar(100) @map("shop_name")
+  module       MerchantModule
+  contactName  String        @db.VarChar(50) @map("contact_name")
+  contactPhone String        @db.VarChar(20) @map("contact_phone")
+  licenseNo    String?       @db.VarChar(50) @map("license_no")
+  licenseImage String?       @db.VarChar(500) @map("license_image")
+  idCardImage  String?       @db.VarChar(500) @map("id_card_image")
+  status       MerchantStatus @default(PENDING)
+  settledAt    DateTime?     @map("settled_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  products     Product[]
+  restaurants  Restaurant[]
+  homestays    Homestay[]
+  financeRecords FinanceRecord[]
+
+  @@map("merchants")
+}
+
+enum MerchantModule {
+  CLOTHING    // 衣
+  DINING      // 食
+  ACCOMMODATION // 住
+  TRAVEL      // 行
+}
+
+enum MerchantStatus {
+  PENDING   // 待审核
+  APPROVED  // 已通过
+  REJECTED  // 已驳回
+  DISABLED  // 已禁用
+}
+
+/// 商家入驻申请
+model MerchantApplication {
+  id           Int               @id @default(autoincrement())
+  userId       Int               @map("user_id")
+  shopName     String            @db.VarChar(100) @map("shop_name")
+  module       MerchantModule
+  contactName  String            @db.VarChar(50) @map("contact_name")
+  contactPhone String            @db.VarChar(20) @map("contact_phone")
+  licenseNo    String?           @db.VarChar(50) @map("license_no")
+  licenseImage String?           @db.VarChar(500) @map("license_image")
+  idCardImage  String?           @db.VarChar(500) @map("id_card_image")
+  status       ApplicationStatus @default(PENDING)
+  rejectReason String?           @db.VarChar(500) @map("reject_reason")
+  reviewerId   Int?              @map("reviewer_id")
+  reviewedAt   DateTime?         @map("reviewed_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  user         User              @relation(fields: [userId], references: [id])
+
+  @@map("merchant_applications")
+}
+
+enum ApplicationStatus {
+  PENDING   // 待审核
+  APPROVED  // 已通过
+  REJECTED  // 已驳回
+}
+
+/// 收货地址
+model Address {
+  id          Int     @id @default(autoincrement())
+  userId      Int     @map("user_id")
+  name        String  @db.VarChar(50)
+  phone       String  @db.VarChar(20)
+  province    String  @db.VarChar(50)
+  city        String  @db.VarChar(50)
+  district    String  @db.VarChar(50)
+  detail      String  @db.VarChar(200)
+  isDefault   Boolean @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User    @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
+}
+
+// ============================================================
+// 统一订单模块
+// ============================================================
+
+/// 统一订单表
+model Order {
+  id           Int         @id @default(autoincrement())
+  orderNo      String      @unique @db.VarChar(32) @map("order_no")
+  userId       Int         @map("user_id")
+  orderType    OrderType
+  module       MerchantModule
+  status       OrderStatus @default(PENDING_PAYMENT)
+  totalAmount  Decimal     @db.Decimal(10, 2) @map("total_amount")
+  payAmount    Decimal?    @db.Decimal(10, 2) @map("pay_amount")
+  payMethod    String?     @db.VarChar(20) @map("pay_method")
+  payTime      DateTime?   @map("pay_time")
+  tradeNo      String?     @db.VarChar(64) @map("trade_no") // 第三方支付交易号
+  remark       String?     @db.VarChar(500)
+  cancelReason String?     @db.VarChar(500) @map("cancel_reason")
+  cancelTime   DateTime?   @map("cancel_time")
+  completedAt  DateTime?   @map("completed_at")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  user         User        @relation(fields: [userId], references: [id])
+  items        OrderItem[]
+  payment      Payment?
+  refund       Refund?
+
+  @@index([userId, status])
+  @@index([orderType, status])
+  @@map("orders")
+}
+
+enum OrderType {
+  PRODUCT       // 商品订单 (模块1衣 + 模块2食特产)
+  TABLE_BOOKING // 餐位预订 (模块2食)
+  ACCOMMODATION // 住宿预订 (模块3住)
+  TICKET        // 门票订单 (模块4行)
+  ROUTE         // 路线订单 (模块4行)
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT   // 待支付
+  PAID              // 已支付/待确认
+  CONFIRMED         // 已确认
+  IN_PROGRESS       // 进行中
+  COMPLETED         // 已完成
+  CANCELLED         // 已取消
+  REFUNDING         // 退款中
+  REFUNDED          // 已退款
+}
+
+/// 订单明细
+model OrderItem {
+  id          Int     @id @default(autoincrement())
+  orderId     Int     @map("order_id")
+  productId   Int?    @map("product_id")
+  productName String  @db.VarChar(200) @map("product_name")
+  productImage String? @db.VarChar(500) @map("product_image")
+  skuId       Int?    @map("sku_id")
+  skuName     String? @db.VarChar(200) @map("sku_name")
+  price       Decimal @db.Decimal(10, 2)
+  quantity    Int
+  subtotal    Decimal @db.Decimal(10, 2)
+
+  order       Order   @relation(fields: [orderId], references: [id])
+
+  @@map("order_items")
+}
+
+/// 支付记录
+model Payment {
+  id          Int           @id @default(autoincrement())
+  orderId     Int           @unique @map("order_id")
+  amount      Decimal       @db.Decimal(10, 2)
+  method      String        @db.VarChar(20) // wechat, alipay
+  tradeNo     String?       @db.VarChar(64) @map("trade_no")
+  status      PaymentStatus @default(PENDING)
+  paidAt      DateTime?     @map("paid_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  order       Order         @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING   // 待支付
+  SUCCESS   // 支付成功
+  FAILED    // 支付失败
+  REFUNDED  // 已退款
+}
+
+/// 退款记录
+model Refund {
+  id          Int         @id @default(autoincrement())
+  orderId     Int         @unique @map("order_id")
+  amount      Decimal     @db.Decimal(10, 2)
+  reason      String      @db.VarChar(500)
+  status      RefundStatus @default(PENDING)
+  reviewerId  Int?        @map("reviewer_id")
+  reviewedAt  DateTime?   @map("reviewed_at")
+  refundedAt  DateTime?   @map("refunded_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  order       Order       @relation(fields: [orderId], references: [id])
+
+  @@map("refunds")
+}
+
+enum RefundStatus {
+  PENDING    // 待审核
+  APPROVED   // 已通过
+  REJECTED   // 已驳回
+  COMPLETED  // 已退款
+}
+
+// ============================================================
+// 统一购物车 (模块1衣 + 模块2食)
+// ============================================================
+
+model CartItem {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  productId   Int      @map("product_id")
+  skuId       Int?     @map("sku_id")
+  quantity    Int      @default(1)
+  selected    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, productId, skuId])
+  @@map("cart_items")
+}
+
+// ============================================================
+// 公共 - 收藏 / 评价 / 消息 / 搜索
+// ============================================================
+
+/// 收藏 (多态: 收藏商品/餐厅/民宿/路线/游记)
+model Favorite {
+  id         Int            @id @default(autoincrement())
+  userId     Int            @map("user_id")
+  targetType FavoriteTarget
+  targetId   Int            @map("target_id")
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  user       User           @relation(fields: [userId], references: [id])
+
+  @@unique([userId, targetType, targetId])
+  @@map("favorites")
+}
+
+enum FavoriteTarget {
+  PRODUCT   // 商品
+  RESTAURANT // 餐厅
+  HOMESTAY  // 民宿
+  ROUTE     // 路线
+  POST      // 游记
+}
+
+/// 评价 (多态)
+model Review {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  targetType  ReviewTarget
+  targetId    Int       @map("target_id")
+  orderId     Int?      @map("order_id")
+  rating      Int       // 1-5星
+  content     String?   @db.Text
+  images      String?   @db.Text // JSON数组
+  appendContent String? @db.Text @map("append_content")
+  appendTime  DateTime? @map("append_time")
+  replyContent String?  @db.Text @map("reply_content")
+  replyTime   DateTime? @map("reply_time")
+  status      ReviewStatus @default(NORMAL)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@index([targetType, targetId])
+  @@map("reviews")
+}
+
+enum ReviewTarget {
+  PRODUCT    // 商品
+  RESTAURANT // 餐厅
+  HOMESTAY   // 民宿
+  ROUTE      // 路线
+}
+
+enum ReviewStatus {
+  NORMAL    // 正常
+  HIDDEN    // 已隐藏
+  DELETED   // 已删除
+}
+
+/// 站内消息
+model Message {
+  id          Int         @id @default(autoincrement())
+  userId      Int         @map("user_id")
+  type        MessageType
+  title       String      @db.VarChar(200)
+  content     String      @db.Text
+  isRead      Boolean     @default(false) @map("is_read")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@map("messages")
+}
+
+enum MessageType {
+  SYSTEM  // 系统公告
+  ORDER   // 订单消息
+  INTERACT // 互动消息
+}
+
+/// 搜索历史
+model SearchHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  keyword   String   @db.VarChar(100)
+  module    String?  @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@map("search_history")
+}
+
+// ============================================================
+// 模块一：衣——非遗商品
+// ============================================================
+
+/// 商品分类
+model ProductCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  icon      String?  @db.VarChar(500)
+  parentId  Int?     @map("parent_id")
+  sort      Int      @default(0)
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  parent    ProductCategory? @relation("categoryTree", fields: [parentId], references: [id])
+  children  ProductCategory[] @relation("categoryTree")
+  products  Product[]
+
+  @@map("product_categories")
+}
+
+/// 商品
+model Product {
+  id              Int      @id @default(autoincrement())
+  categoryId      Int      @map("category_id")
+  merchantId      Int      @map("merchant_id")
+  title           String   @db.VarChar(200)
+  subtitle        String?  @db.VarChar(500)
+  mainImage       String   @db.VarChar(500) @map("main_image")
+  price           Decimal  @db.Decimal(10, 2)
+  marketPrice     Decimal? @db.Decimal(10, 2) @map("market_price")
+  stock           Int      @default(0)
+  sales           Int      @default(0)
+  detail          String?  @db.LongText
+  craftIntro      String?  @db.Text @map("craft_intro")        // 工艺介绍
+  artisanId       String?  @db.VarChar(100) @map("artisan_id") // 传承人ID
+  artisanName     String?  @db.VarChar(50) @map("artisan_name")
+  artisanStory    String?  @db.Text @map("artisan_story")      // 传承人故事
+  status          ProductStatus @default(DRAFT)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  category        ProductCategory @relation(fields: [categoryId], references: [id])
+  merchant        Merchant        @relation(fields: [merchantId], references: [id])
+  skus            ProductSku[]
+  images          ProductImage[]
+
+  @@index([categoryId, status])
+  @@index([merchantId])
+  @@map("products")
+}
+
+enum ProductStatus {
+  DRAFT     // 草稿
+  ACTIVE    // 已上架
+  INACTIVE  // 已下架
+}
+
+/// 商品SKU
+model ProductSku {
+  id          Int      @id @default(autoincrement())
+  productId    Int      @map("product_id")
+  specName    String   @db.VarChar(200) @map("spec_name") // 如"银饰-手镯-中号"
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  image       String?  @db.VarChar(500)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("product_skus")
+}
+
+/// 商品图片
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int     @map("product_id")
+  imageUrl  String  @db.VarChar(500) @map("image_url")
+  sort      Int     @default(0)
+
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("product_images")
+}
+
+// ============================================================
+// 模块二：食——餐饮美食
+// ============================================================
+
+/// 餐厅
+model Restaurant {
+  id           Int      @id @default(autoincrement())
+  merchantId   Int      @map("merchant_id")
+  name         String   @db.VarChar(100)
+  address      String   @db.VarChar(200)
+  longitude    Decimal? @db.Decimal(10, 7)
+  latitude     Decimal? @db.Decimal(10, 7)
+  openTime     String?  @db.VarChar(100) @map("open_time")
+  capacity     Int      @default(0) // 容纳人数
+  introduction String?  @db.Text
+  mainImage    String   @db.VarChar(500) @map("main_image")
+  phone        String?  @db.VarChar(20)
+  status       RestaurantStatus @default(ACTIVE)
+  rating       Decimal  @default(0) @db.Decimal(3, 1)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  merchant     Merchant @relation(fields: [merchantId], references: [id])
+  dishes       RestaurantDish[]
+  timeSlots    TimeSlot[]
+  bookings     TableBooking[]
+
+  @@map("restaurants")
+}
+
+enum RestaurantStatus {
+  ACTIVE    // 营业中
+  INACTIVE  // 已下架
+}
+
+/// 餐厅菜品
+model RestaurantDish {
+  id           Int      @id @default(autoincrement())
+  restaurantId Int      @map("restaurant_id")
+  name         String   @db.VarChar(100)
+  price        Decimal  @db.Decimal(10, 2)
+  mainImage    String?  @db.VarChar(500) @map("main_image")
+  introduction String?  @db.VarChar(500)
+  isSignature  Boolean  @default(false) @map("is_signature") // 是否招牌菜
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@map("restaurant_dishes")
+}
+
+/// 餐位时段
+model TimeSlot {
+  id           Int      @id @default(autoincrement())
+  restaurantId Int      @map("restaurant_id")
+  name         String   @db.VarChar(50) // 如"午餐 11:30-13:30"
+  startTime    String   @db.VarChar(10) @map("start_time")
+  endTime      String   @db.VarChar(10) @map("end_time")
+  maxBooking   Int      @map("max_booking") // 最大预订数
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@map("time_slots")
+}
+
+/// 餐位预订
+model TableBooking {
+  id           Int           @id @default(autoincrement())
+  restaurantId Int           @map("restaurant_id")
+  userId       Int           @map("user_id")
+  bookingDate  DateTime      @map("booking_date") @db.Date
+  timeSlotId   Int           @map("time_slot_id")
+  guestCount   Int           @map("guest_count")
+  contactName  String        @db.VarChar(50) @map("contact_name")
+  contactPhone String        @db.VarChar(20) @map("contact_phone")
+  remark       String?       @db.VarChar(500)
+  status       BookingStatus @default(PENDING)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
+
+  @@map("table_bookings")
+}
+
+enum BookingStatus {
+  PENDING    // 待确认
+  CONFIRMED  // 已确认
+  CANCELLED  // 已取消
+  COMPLETED  // 已完成
+}
+
+/// 农产品分类
+model FarmCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  icon      String?  @db.VarChar(500)
+  sort      Int      @default(0)
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  products  FarmProduct[]
+
+  @@map("farm_categories")
+}
+
+/// 农产品
+model FarmProduct {
+  id           Int      @id @default(autoincrement())
+  categoryId   Int      @map("category_id")
+  merchantId   Int      @map("merchant_id")
+  name         String   @db.VarChar(200)
+  price        Decimal  @db.Decimal(10, 2)
+  spec         String?  @db.VarChar(100)   // 规格
+  stock        Int      @default(0)
+  mainImage    String   @db.VarChar(500) @map("main_image")
+  origin       String?  @db.VarChar(100)   // 产地
+  shelfLife    String?  @db.VarChar(50) @map("shelf_life") // 保质期
+  detail       String?  @db.LongText
+  status       ProductStatus @default(DRAFT)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  category     FarmCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId, status])
+  @@map("farm_products")
+}
+
+// ============================================================
+// 模块三：住——住宿预订
+// ============================================================
+
+/// 民宿
+model Homestay {
+  id           Int      @id @default(autoincrement())
+  merchantId   Int      @map("merchant_id")
+  name         String   @db.VarChar(100)
+  address      String   @db.VarChar(200)
+  longitude    Decimal? @db.Decimal(10, 7)
+  latitude     Decimal? @db.Decimal(10, 7)
+  styleTags    String?  @db.VarChar(500) @map("style_tags")    // JSON数组
+  facilityTags String?  @db.VarChar(500) @map("facility_tags") // JSON数组
+  mainImage    String   @db.VarChar(500) @map("main_image")
+  introduction String?  @db.Text
+  rating       Decimal  @default(0) @db.Decimal(3, 1)
+  status       HomestayStatus @default(ACTIVE)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  merchant     Merchant @relation(fields: [merchantId], references: [id])
+  roomTypes    RoomType[]
+  checkinRules CheckinRule?
+
+  @@map("homestays")
+}
+
+enum HomestayStatus {
+  ACTIVE    // 上架
+  INACTIVE  // 下架
+}
+
+/// 房型
+model RoomType {
+  id           Int      @id @default(autoincrement())
+  homestayId   Int      @map("homestay_id")
+  name         String   @db.VarChar(100) // 如"苗族木屋大床房"
+  bedType      String   @db.VarChar(50) @map("bed_type")
+  area         Int?     // 面积㎡
+  maxGuests    Int      @map("max_guests")
+  facilities   String?  @db.VarChar(500) // JSON数组
+  price        Decimal  @db.Decimal(10, 2)
+  stock        Int      @default(0)
+  mainImage    String?  @db.VarChar(500) @map("main_image")
+  images       String?  @db.Text // JSON数组
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  homestay     Homestay @relation(fields: [homestayId], references: [id])
+  calendars    RoomCalendar[]
+
+  @@map("room_types")
+}
+
+/// 房态日历
+model RoomCalendar {
+  id          Int      @id @default(autoincrement())
+  roomTypeId  Int      @map("room_type_id")
+  date        DateTime @db.Date
+  available   Int      @default(0) // 可用库存
+  price       Decimal? @db.Decimal(10, 2) // 动态定价，null则用房型默认价
+  status      CalendarStatus @default(AVAILABLE)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  roomType    RoomType @relation(fields: [roomTypeId], references: [id])
+
+  @@unique([roomTypeId, date])
+  @@map("room_calendars")
+}
+
+enum CalendarStatus {
+  AVAILABLE   // 可预订
+  SOLD_OUT    // 已满
+  BLOCKED     // 不可订
+}
+
+/// 入住须知
+model CheckinRule {
+  id           Int      @id @default(autoincrement())
+  homestayId   Int      @unique @map("homestay_id")
+  checkinTime  String   @db.VarChar(20) @map("checkin_time")   // 如"14:00后"
+  checkoutTime String   @db.VarChar(20) @map("checkout_time")  // 如"12:00前"
+  petPolicy    String?  @db.VarChar(200) @map("pet_policy")
+  hasBreakfast Boolean  @default(false) @map("has_breakfast")
+  deposit      Decimal? @db.Decimal(10, 2)
+  notes        String?  @db.Text
+
+  homestay     Homestay @relation(fields: [homestayId], references: [id])
+
+  @@map("checkin_rules")
+}
+
+// ============================================================
+// 模块四：行——线路订票
+// ============================================================
+
+/// 景区
+model ScenicSpot {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  address      String   @db.VarChar(200)
+  longitude    Decimal? @db.Decimal(10, 7)
+  latitude     Decimal? @db.Decimal(10, 7)
+  openTime     String?  @db.VarChar(100) @map("open_time")
+  introduction String?  @db.Text
+  mainImage    String   @db.VarChar(500) @map("main_image")
+  status       SpotStatus @default(ACTIVE)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  ticketTypes  TicketType[]
+
+  @@map("scenic_spots")
+}
+
+enum SpotStatus {
+  ACTIVE    // 上架
+  INACTIVE  // 下架
+}
+
+/// 票种
+model TicketType {
+  id           Int      @id @default(autoincrement())
+  spotId       Int      @map("spot_id")
+  name         String   @db.VarChar(100) // 成人票/儿童票/学生票/家庭套票
+  price        Decimal  @db.Decimal(10, 2)
+  stock        Int      @default(0)
+  validRule    String?  @db.VarChar(200) @map("valid_rule") // 有效期规则
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  spot         ScenicSpot @relation(fields: [spotId], references: [id])
+
+  @@map("ticket_types")
+}
+
+/// 路线套餐
+model TravelRoute {
+  id             Int      @id @default(autoincrement())
+  title          String   @db.VarChar(200)
+  days           Int      // 行程天数
+  price          Decimal  @db.Decimal(10, 2)
+  includedItems  String?  @db.Text @map("included_items")  // 包含项目 JSON
+  departure      String?  @db.VarChar(100) // 出发地
+  destination    String?  @db.VarChar(100) // 目的地
+  accommodation  String?  @db.VarChar(200) // 住宿标准
+  meals          String?  @db.VarChar(200) // 餐饮标准
+  notes          String?  @db.Text         // 注意事项
+  mainImage      String   @db.VarChar(500) @map("main_image")
+  detail         String?  @db.LongText
+  themeTags      String?  @db.VarChar(500) @map("theme_tags") // 亲子/摄影/研学/节庆
+  status         RouteStatus @default(ACTIVE)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  itineraries    RouteItinerary[]
+
+  @@map("travel_routes")
+}
+
+enum RouteStatus {
+  ACTIVE    // 上架
+  INACTIVE  // 下架
+}
+
+/// 路线行程
+model RouteItinerary {
+  id          Int     @id @default(autoincrement())
+  routeId     Int     @map("route_id")
+  day         Int     // 第几天
+  description String  @db.Text
+  scenicSpots String? @db.VarChar(500) @map("scenic_spots") // JSON
+  meals       String? @db.VarChar(200)
+  accommodation String? @db.VarChar(200)
+  transport   String? @db.VarChar(200)
+
+  route       TravelRoute @relation(fields: [routeId], references: [id])
+
+  @@map("route_itineraries")
+}
+
+/// 电子票
+model ETicket {
+  id          Int         @id @default(autoincrement())
+  orderId     Int         @map("order_id")
+  ticketCode  String      @unique @db.VarChar(32) @map("ticket_code")
+  qrCode      String?     @db.VarChar(500) @map("qr_code")
+  targetId    Int         @map("target_id") // 票种ID或路线ID
+  targetType  String      @db.VarChar(20) @map("target_type") // ticket/route
+  validDate   DateTime    @map("valid_date") @db.Date
+  status      TicketStatus @default(UNUSED)
+  usedAt      DateTime?   @map("used_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@index([orderId])
+  @@map("e_tickets")
+}
+
+enum TicketStatus {
+  UNUSED    // 未使用
+  USED      // 已使用
+  EXPIRED   // 已过期
+  REFUNDED  // 已退款
+}
+
+/// 交通攻略
+model TransportGuide {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(200)
+  departure   String   @db.VarChar(100) // 出发地
+  destination String   @db.VarChar(100) // 目的地
+  transportType String @db.VarChar(50) @map("transport_type") // 飞机/高铁/自驾/大巴
+  duration    String?  @db.VarChar(50) // 时长
+  cost        String?  @db.VarChar(50) // 费用
+  detail      String?  @db.Text
+  images      String?  @db.Text // JSON数组
+  sort        Int      @default(0)
+  status      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("transport_guides")
+}
+
+// ============================================================
+// 模块五：社区——照片分享
+// ============================================================
+
+/// 游记
+model Post {
+  id           Int        @id @default(autoincrement())
+  userId       Int        @map("user_id")
+  title        String     @db.VarChar(200)
+  content      String?    @db.Text
+  images       String?    @db.Text      // JSON数组，最多9张
+  videoUrl     String?    @db.VarChar(500) @map("video_url")
+  locationId   Int?       @map("location_id")     // 关联地点ID
+  locationType String?    @db.VarChar(20) @map("location_type") // restaurant/homestay/spot
+  locationName String?    @db.VarChar(100) @map("location_name")
+  topicIds     String?    @db.VarChar(500) @map("topic_ids") // JSON数组
+  likeCount    Int        @default(0) @map("like_count")
+  commentCount Int        @default(0) @map("comment_count")
+  favoriteCount Int       @default(0) @map("favorite_count")
+  viewCount    Int        @default(0) @map("view_count")
+  status       PostStatus @default(UNDER_REVIEW)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  user         User       @relation(fields: [userId], references: [id])
+  comments     Comment[]
+
+  @@index([userId, status])
+  @@index([status, createdAt])
+  @@map("posts")
+}
+
+enum PostStatus {
+  UNDER_REVIEW // 审核中
+  NORMAL       // 正常
+  REJECTED     // 审核不通过
+  OFF_SHELF    // 已下架
+}
+
+/// 评论
+model Comment {
+  id            Int      @id @default(autoincrement())
+  postId        Int      @map("post_id")
+  userId        Int      @map("user_id")
+  content       String   @db.VarChar(500)
+  parentId      Int?     @map("parent_id") // 回复的评论ID
+  replyToUserId Int?     @map("reply_to_user_id")
+  likeCount     Int      @default(0) @map("like_count")
+  status        CommentStatus @default(NORMAL)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  post          Post     @relation(fields: [postId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
+  parent        Comment? @relation("commentTree", fields: [parentId], references: [id])
+  children      Comment[] @relation("commentTree")
+
+  @@index([postId, status])
+  @@map("comments")
+}
+
+enum CommentStatus {
+  NORMAL   // 正常
+  HIDDEN   // 已隐藏
+  DELETED  // 已删除
+}
+
+/// 话题
+model Topic {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  coverImage  String?  @db.VarChar(500) @map("cover_image")
+  followCount Int      @default(0) @map("follow_count")
+  postCount   Int      @default(0) @map("post_count")
+  isTop       Boolean  @default(false) @map("is_top")
+  isRecommend Boolean  @default(false) @map("is_recommend")
+  status      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("topics")
+}
+
+/// 关注关系
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int      @map("follower_id")  // 关注者
+  followingId Int      @map("following_id") // 被关注者
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  following   User     @relation("following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+/// 点赞 (多态)
+model Like {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  targetType LikeTarget
+  targetId   Int       @map("target_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, targetType, targetId])
+  @@map("likes")
+}
+
+enum LikeTarget {
+  POST     // 游记
+  COMMENT  // 评论
+}
+
+/// 举报
+model Report {
+  id          Int          @id @default(autoincrement())
+  reporterId  Int          @map("reporter_id")
+  targetType  ReportTarget
+  targetId    Int          @map("target_id")
+  reason      String       @db.VarChar(500)
+  status      ReportStatus @default(PENDING)
+  handlerId   Int?         @map("handler_id")
+  handleResult String?     @db.VarChar(500) @map("handle_result")
+  handledAt   DateTime?    @map("handled_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  reporter    User         @relation("reporter", fields: [reporterId], references: [id])
+
+  @@map("reports")
+}
+
+enum ReportTarget {
+  POST     // 游记
+  COMMENT  // 评论
+}
+
+enum ReportStatus {
+  PENDING   // 待处理
+  HANDLED   // 已处理
+  REJECTED  // 已驳回
+}
+
+// ============================================================
+// 模块六：平台管理后台
+// ============================================================
+
+/// 管理员账号
+model AdminUser {
+  id          Int        @id @default(autoincrement())
+  username    String     @unique @db.VarChar(50)
+  password    String     @db.VarChar(255)
+  name        String     @db.VarChar(50)
+  roleId      Int        @map("role_id")
+  status      AdminStatus @default(ACTIVE)
+  lastLoginAt DateTime?  @map("last_login_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  role        AdminRole  @relation(fields: [roleId], references: [id])
+  operationLogs OperationLog[]
+
+  @@map("admin_users")
+}
+
+enum AdminStatus {
+  ACTIVE    // 正常
+  DISABLED  // 禁用
+}
+
+/// 角色
+model AdminRole {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  permissions String   @db.Text // JSON数组，权限标识列表
+  description String?  @db.VarChar(200)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  adminUsers  AdminUser[]
+
+  @@map("admin_roles")
+}
+
+/// 操作日志
+model OperationLog {
+  id          Int      @id @default(autoincrement())
+  operatorId  Int      @map("operator_id")
+  action      String   @db.VarChar(50)
+  target      String   @db.VarChar(100)
+  content     String?  @db.Text
+  ip          String?  @db.VarChar(50)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  operator    AdminUser @relation(fields: [operatorId], references: [id])
+
+  @@index([operatorId, createdAt])
+  @@map("operation_logs")
+}
+
+/// 平台公告
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("announcements")
+}
+
+/// 轮播图
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(100)
+  imageUrl  String   @db.VarChar(500) @map("image_url")
+  linkUrl   String?  @db.VarChar(500) @map("link_url")
+  module    String?  @db.VarChar(20) // 所属模块
+  sort      Int      @default(0)
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("banners")
+}
+
+/// 推荐位
+model Recommendation {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  targetType  String   @db.VarChar(20) @map("target_type")
+  targetId    Int      @map("target_id")
+  module      String?  @db.VarChar(20)
+  sort        Int      @default(0)
+  status      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("recommendations")
+}
+
+/// 财务记录
+model FinanceRecord {
+  id           Int            @id @default(autoincrement())
+  orderId      Int            @map("order_id")
+  merchantId   Int            @map("merchant_id")
+  orderAmount  Decimal        @db.Decimal(10, 2) @map("order_amount")
+  commission   Decimal        @db.Decimal(10, 2) // 平台抽佣
+  merchantIncome Decimal      @db.Decimal(10, 2) @map("merchant_income")
+  status       SettlementStatus @default(PENDING)
+  settledAt    DateTime?      @map("settled_at")
+  createdAt    DateTime       @default(now()) @map("created_at")
+
+  merchant     Merchant       @relation(fields: [merchantId], references: [id])
+
+  @@index([merchantId, status])
+  @@map("finance_records")
+}
+
+enum SettlementStatus {
+  PENDING    // 待结算
+  SETTLED    // 已结算
+}
+
+/// 系统配置
+model SystemConfig {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.Text
+  remark    String?  @db.VarChar(200)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_configs")
+}
+
+/// 敏感词库
+model SensitiveWord {
+  id        Int      @id @default(autoincrement())
+  word      String   @unique @db.VarChar(100)
+  level     Int      @default(1) // 敏感等级 1-3
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sensitive_words")
+}

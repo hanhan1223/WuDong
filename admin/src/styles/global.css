@@ -1,0 +1,79 @@
+@import "./variables.css";
+
+/* 阿里巴巴普惠体 - 免费商用中文字体 */
+@font-face {
+  font-family: "Alibaba PuHuiTi";
+  font-weight: 300;
+  font-display: swap;
+  src: url("https://fonts.alicdn.com/font_service/font/file/Alibaba-PuHuiTi-3-35-Thin.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Alibaba PuHuiTi";
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://fonts.alicdn.com/font_service/font/file/Alibaba-PuHuiTi-3-55-Regular.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Alibaba PuHuiTi";
+  font-weight: 600;
+  font-display: swap;
+  src: url("https://fonts.alicdn.com/font_service/font/file/Alibaba-PuHuiTi-3-85-Bold.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Alibaba PuHuiTi";
+  font-weight: 900;
+  font-display: swap;
+  src: url("https://fonts.alicdn.com/font_service/font/file/Alibaba-PuHuiTi-3-115-Black.woff2")
+    format("woff2");
+}
+
+/* DIN Alternate Bold - 数字字体 */
+@font-face {
+  font-family: "DIN Alternate";
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://fonts.cdnfonts.com/css/din-alternate") format("woff2");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 数字使用 DIN 字体 */
+.price,
+.stat-number {
+  font-family: "DIN Alternate", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

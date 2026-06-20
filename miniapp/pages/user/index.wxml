@@ -1,0 +1,64 @@
+<!--pages/user/index.wxml-->
+<view class="page">
+  <!-- 用户信息区 -->
+  <view class="user-header" bind:tap="onAvatarTap">
+    <view class="avatar-wrap">
+      <image
+        wx:if="{{userInfo.avatar}}"
+        class="avatar"
+        src="{{userInfo.avatar}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="avatar-default">
+        <text class="avatar-text">{{isLoggedIn ? userInfo.nickname[0] : '?'}}</text>
+      </view>
+    </view>
+    <view class="user-info">
+      <text class="nickname">{{isLoggedIn ? userInfo.nickname : '点击登录'}}</text>
+      <text class="user-desc text-tertiary">{{isLoggedIn ? '享受乌东文旅服务' : '登录后查看更多功能'}}</text>
+    </view>
+    <text class="arrow">></text>
+  </view>
+
+  <!-- 我的订单 -->
+  <view class="section card">
+    <view class="section-header">
+      <text class="section-title">我的订单</text>
+      <text class="section-more" bind:tap="onOrderTabTap" data-key="all">全部订单 ></text>
+    </view>
+    <view class="order-tabs">
+      <view
+        class="order-tab"
+        wx:for="{{orderTabs}}"
+        wx:key="key"
+        bind:tap="onOrderTabTap"
+        data-key="{{item.key}}"
+      >
+        <text class="tab-icon">{{item.icon}}</text>
+        <text class="tab-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="section card">
+    <view
+      class="menu-item"
+      wx:for="{{menuItems}}"
+      wx:key="id"
+      bind:tap="onMenuTap"
+      data-path="{{item.path}}"
+    >
+      <view class="menu-left">
+        <text class="menu-icon">{{item.icon}}</text>
+        <text class="menu-name">{{item.name}}</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view wx:if="{{isLoggedIn}}" class="logout-btn" bind:tap="onLogout">
+    退出登录
+  </view>
+</view>

@@ -1,0 +1,47 @@
+<!--pages/homestay/list.wxml-->
+<view class="page">
+  <!-- 搜索条件 -->
+  <view class="search-bar card">
+    <view class="search-row">
+      <view class="search-item">
+        <text class="search-label">入住</text>
+        <picker mode="date" value="{{checkIn}}" start="{{checkIn}}" bind:change="onCheckInChange">
+          <text class="search-value">{{checkIn}}</text>
+        </picker>
+      </view>
+      <view class="search-item">
+        <text class="search-label">离店</text>
+        <picker mode="date" value="{{checkOut}}" start="{{checkIn}}" bind:change="onCheckOutChange">
+          <text class="search-value">{{checkOut}}</text>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <!-- 民宿列表 -->
+  <view class="homestay-list">
+    <view
+      class="homestay-card card"
+      wx:for="{{homestays}}"
+      wx:key="id"
+      bind:tap="onHomestayTap"
+      data-id="{{item.id}}"
+    >
+      <image class="homestay-img" src="{{item.mainImage}}" mode="aspectFill" />
+      <view class="homestay-info">
+        <text class="homestay-name">{{item.name}}</text>
+        <view class="homestay-tags">
+          <text class="tag tag-primary" wx:for="{{item.styleTags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+        </view>
+        <view class="homestay-meta">
+          <text class="rating">⭐ {{item.rating}}</text>
+          <text class="text-tertiary text-sm">📍 {{item.address}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-tip">
+    <text class="text-tertiary">加载中...</text>
+  </view>
+</view>

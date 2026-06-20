@@ -1,0 +1,64 @@
+<!--pages/index/index.wxml-->
+<view class="page">
+  <!-- 搜索栏 -->
+  <view class="search-bar" bind:tap="onSearchTap">
+    <view class="search-input">
+      <text class="icon-search">🔍</text>
+      <text class="search-placeholder">搜索商品、餐厅、民宿...</text>
+    </view>
+  </view>
+
+  <!-- 轮播图 -->
+  <swiper class="banner-swiper" autoplay circular indicator-dots bind:change="onBannerTap">
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <image class="banner-image" src="{{item.imageUrl}}" mode="aspectFill" />
+    </swiper-item>
+    <swiper-item wx:if="{{banners.length === 0}}">
+      <view class="banner-placeholder">
+        <text>乌东文旅</text>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 金刚区入口 -->
+  <view class="category-grid">
+    <view
+      class="category-item"
+      wx:for="{{categories}}"
+      wx:key="id"
+      bind:tap="onCategoryTap"
+      data-path="{{item.path}}"
+    >
+      <view class="category-icon">
+        <text class="icon-text">{{item.name}}</text>
+      </view>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 热门推荐 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">热门推荐</text>
+      <text class="section-more">查看更多 ></text>
+    </view>
+    <view class="recommend-list">
+      <view
+        class="recommend-item card"
+        wx:for="{{recommendations}}"
+        wx:key="id"
+        bind:tap="onRecommendTap"
+        data-item="{{item}}"
+      >
+        <image class="recommend-image" src="{{item.imageUrl}}" mode="aspectFill" />
+        <view class="recommend-info">
+          <text class="recommend-title text-ellipsis">{{item.title}}</text>
+          <text class="recommend-desc text-ellipsis text-secondary">{{item.description}}</text>
+        </view>
+      </view>
+      <view wx:if="{{recommendations.length === 0}}" class="empty-tip">
+        <text class="text-tertiary">暂无推荐内容</text>
+      </view>
+    </view>
+  </view>
+</view>

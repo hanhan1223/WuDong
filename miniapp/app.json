@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/category/index",
+    "pages/message/index",
+    "pages/user/index",
+    "pages/clothing/list",
+    "pages/clothing/detail",
+    "pages/dining/list",
+    "pages/dining/detail",
+    "pages/homestay/list",
+    "pages/homestay/detail",
+    "pages/travel/list",
+    "pages/travel/detail",
+    "pages/community/index",
+    "pages/community/detail",
+    "pages/community/publish",
+    "pages/cart/index",
+    "pages/order/list",
+    "pages/order/detail",
+    "pages/login/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#1F5FA8",
+    "navigationBarTitleText": "乌东文旅",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F7F8FA",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#8C8C8C",
+    "selectedColor": "#1F5FA8",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/category/index",
+        "text": "分类",
+        "iconPath": "assets/tabbar/category.png",
+        "selectedIconPath": "assets/tabbar/category-active.png"
+      },
+      {
+        "pagePath": "pages/message/index",
+        "text": "消息",
+        "iconPath": "assets/tabbar/message.png",
+        "selectedIconPath": "assets/tabbar/message-active.png"
+      },
+      {
+        "pagePath": "pages/user/index",
+        "text": "我的",
+        "iconPath": "assets/tabbar/user.png",
+        "selectedIconPath": "assets/tabbar/user-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

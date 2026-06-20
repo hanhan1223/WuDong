@@ -1,0 +1,60 @@
+<!--pages/cart/index.wxml-->
+<view class="page">
+  <view class="cart-list" wx:if="{{items.length > 0}}">
+    <view class="cart-item card" wx:for="{{items}}" wx:key="id">
+      <!-- 选择框 -->
+      <view
+        class="checkbox {{selectedIds.indexOf(item.id) > -1 ? 'checked' : ''}}"
+        bind:tap="onSelect"
+        data-id="{{item.id}}"
+      >
+        <text wx:if="{{selectedIds.indexOf(item.id) > -1}}">✓</text>
+      </view>
+
+      <!-- 商品图片 -->
+      <image class="item-img" src="{{item.productImage}}" mode="aspectFill" />
+
+      <!-- 商品信息 -->
+      <view class="item-info">
+        <text class="item-name text-ellipsis">{{item.productName}}</text>
+        <text class="item-spec text-tertiary" wx:if="{{item.skuName}}">{{item.skuName}}</text>
+        <view class="item-bottom">
+          <text class="price"><text class="price-symbol">¥</text>{{item.price}}</text>
+          <view class="quantity-control">
+            <view class="qty-btn" bind:tap="onQuantityChange" data-id="{{item.id}}" data-type="minus">-</view>
+            <text class="qty-value">{{item.quantity}}</text>
+            <view class="qty-btn" bind:tap="onQuantityChange" data-id="{{item.id}}" data-type="plus">+</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 删除 -->
+      <view class="delete-btn" bind:tap="onDelete" data-id="{{item.id}}">
+        <text>🗑️</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{items.length === 0 && !loading}}" class="empty-tip">
+    <text class="empty-icon">🛒</text>
+    <text class="text-tertiary">购物车是空的</text>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view wx:if="{{items.length > 0}}" class="bottom-bar">
+    <view class="select-all" bind:tap="onSelectAll">
+      <view class="checkbox {{selectedIds.length === items.length ? 'checked' : ''}}">
+        <text wx:if="{{selectedIds.length === items.length}}">✓</text>
+      </view>
+      <text>全选</text>
+    </view>
+    <view class="total">
+      <text>合计: </text>
+      <text class="price total-price"><text class="price-symbol">¥</text>{{totalPrice}}</text>
+    </view>
+    <button class="checkout-btn" bind:tap="onCheckout">
+      结算({{selectedIds.length}})
+    </button>
+  </view>
+</view>

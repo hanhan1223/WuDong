@@ -1,0 +1,61 @@
+/* pages/dining/list.wxss */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  padding: 24rpx 32rpx 16rpx;
+}
+
+.restaurant-list {
+  padding: 0 32rpx;
+}
+
+.restaurant-card {
+  display: flex;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.restaurant-img {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.restaurant-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.restaurant-name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.restaurant-meta {
+  display: flex;
+  gap: 24rpx;
+  font-size: 24rpx;
+}
+
+.rating {
+  color: var(--color-gold);
+}
+
+.restaurant-addr {
+  font-size: 24rpx;
+}
+
+.loading-tip {
+  text-align: center;
+  padding: 40rpx 0;
+}

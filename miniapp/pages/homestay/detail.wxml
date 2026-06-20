@@ -1,0 +1,76 @@
+<!--pages/homestay/detail.wxml-->
+<view class="page" wx:if="{{homestay}}">
+  <!-- 民宿图片轮播 -->
+  <swiper class="cover-swiper" indicator-dots autoplay circular>
+    <swiper-item>
+      <image class="cover-img" src="{{homestay.mainImage}}" mode="aspectFill" />
+    </swiper-item>
+  </swiper>
+
+  <!-- 民宿信息 -->
+  <view class="info card">
+    <text class="name">{{homestay.name}}</text>
+    <view class="tags">
+      <text class="tag tag-primary" wx:for="{{homestay.styleTags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+    </view>
+    <view class="meta">
+      <text class="rating">⭐ {{homestay.rating}}</text>
+      <text class="text-tertiary">📍 {{homestay.address}}</text>
+    </view>
+    <text class="intro" wx:if="{{homestay.introduction}}">{{homestay.introduction}}</text>
+  </view>
+
+  <!-- 设施标签 -->
+  <view class="facilities card" wx:if="{{homestay.facilityTags}}">
+    <text class="section-title">设施服务</text>
+    <view class="facility-tags">
+      <text class="tag" wx:for="{{homestay.facilityTags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+    </view>
+  </view>
+
+  <!-- 房型列表 -->
+  <view class="section card">
+    <text class="section-title">房型选择</text>
+    <view class="room-list">
+      <view
+        class="room-item {{selectedRoom.id === item.id ? 'selected' : ''}}"
+        wx:for="{{roomTypes}}"
+        wx:key="id"
+        bind:tap="onRoomSelect"
+        data-room="{{item}}"
+      >
+        <image class="room-img" src="{{item.mainImage}}" mode="aspectFill" wx:if="{{item.mainImage}}" />
+        <view class="room-info">
+          <text class="room-name">{{item.name}}</text>
+          <text class="room-meta text-tertiary">{{item.bedType}} · {{item.area}}㎡ · 最多{{item.maxGuests}}人</text>
+          <text class="price"><text class="price-symbol">¥</text>{{item.price}}<text class="text-tertiary">/晚</text></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 入住人信息 -->
+  <view class="section card">
+    <text class="section-title">入住人信息</text>
+    <view class="form-item">
+      <text class="form-label">姓名</text>
+      <input class="form-input" placeholder="请输入入住人姓名" value="{{guestName}}" bind:input="onGuestNameInput" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">手机号</text>
+      <input class="form-input" type="number" placeholder="请输入手机号" value="{{guestPhone}}" bind:input="onGuestPhoneInput" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">身份证</text>
+      <input class="form-input" placeholder="请输入身份证号" value="{{guestIdCard}}" bind:input="onGuestIdCardInput" />
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-bar">
+    <view class="bottom-info">
+      <text class="bottom-price" wx:if="{{selectedRoom}}">¥<text class="big">{{selectedRoom.price}}</text>/晚</text>
+    </view>
+    <button class="book-btn" bind:tap="onBook">立即预订</button>
+  </view>
+</view>

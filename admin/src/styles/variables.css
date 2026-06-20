@@ -1,0 +1,97 @@
+:root {
+  /* 品牌色 */
+  --color-primary: #1f5fa8;
+  --color-primary-dark: #0e3d75;
+  --color-primary-light: #e8f1fb;
+
+  /* 辅色 */
+  --color-secondary-orange: #e85d2f;
+  --color-secondary-green: #6b8e3d;
+  --color-secondary-gold: #d4a14b;
+
+  /* 中性色 */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #595959;
+  --color-text-tertiary: #8c8c8c;
+  --color-text-disabled: #bfbfbf;
+
+  --color-border-primary: #e5e5e5;
+  --color-border-secondary: #f0f0f0;
+
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f7f8fa;
+  --color-bg-tertiary: #fafafa;
+
+  /* 功能色 */
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
+  --color-info: #1f5fa8;
+
+  /* 间距 */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+
+  /* 字号 */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+
+  /* 阴影 */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-deep: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  /* === 苗族文化设计变量 === */
+  /* 蜡染靛蓝 - 用于装饰点缀、背景图案 */
+  --color-indigo: #1a3a5c;
+  --color-indigo-light: #2c5282;
+  --color-indigo-dark: #0e2a47;
+
+  /* 苗银色 - 用于高端品类、装饰 */
+  --color-silver: #c0c0c0;
+  --color-silver-light: #e8e8e8;
+  --color-silver-dark: #a0a0a0;
+
+  /* 梯田绿 - 自然类目 */
+  --color-terrace: #6b8e3d;
+  --color-terrace-light: #8fbc5a;
+  --color-terrace-dark: #4a6b2a;
+
+  /* 苗寨木屋棕 - 文案点缀 */
+  --color-wood: #7a5230;
+  --color-wood-light: #a67c52;
+  --color-wood-dark: #5c3d22;
+
+  /* 品牌色阴影 */
+  --shadow-brand: 0 4px 12px rgba(31, 95, 168, 0.2);
+  --shadow-brand-hover: 0 6px 16px rgba(31, 95, 168, 0.3);
+
+  /* 动画时长 */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* 缓动函数 */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}

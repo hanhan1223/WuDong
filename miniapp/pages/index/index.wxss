@@ -1,0 +1,160 @@
+/* pages/index/index.wxss */
+.page {
+  padding-bottom: 20rpx;
+}
+
+/* 搜索栏 */
+.search-bar {
+  padding: 16rpx 32rpx;
+  background: var(--color-primary);
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999rpx;
+  padding: 16rpx 24rpx;
+}
+
+.icon-search {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+
+.search-placeholder {
+  color: var(--color-text-tertiary);
+  font-size: 26rpx;
+}
+
+/* 轮播图 */
+.banner-swiper {
+  height: 320rpx;
+  margin: 16rpx 32rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 16rpx;
+}
+
+.banner-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1f5fa8, #0e3d75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+}
+
+/* 金刚区 */
+.category-grid {
+  display: flex;
+  justify-content: space-around;
+  padding: 32rpx 16rpx;
+  background: #fff;
+  margin: 0 32rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.category-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.category-name {
+  font-size: 24rpx;
+  color: var(--color-text);
+}
+
+/* 热门推荐 */
+.section {
+  margin: 24rpx 32rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: var(--color-text-tertiary);
+}
+
+.recommend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.recommend-item {
+  display: flex;
+  padding: 20rpx;
+}
+
+.recommend-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.recommend-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12rpx;
+  overflow: hidden;
+}
+
+.recommend-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.recommend-desc {
+  font-size: 24rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 60rpx 0;
+}

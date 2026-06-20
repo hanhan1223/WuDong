@@ -1,0 +1,163 @@
+/* pages/travel/detail.wxss */
+.page {
+  padding-bottom: 120rpx;
+  background: var(--color-bg);
+}
+
+.cover-img {
+  width: 100%;
+  height: 400rpx;
+}
+
+.info {
+  margin-top: -20rpx;
+  border-radius: 24rpx 24rpx 0 0;
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.meta {
+  display: flex;
+  gap: 24rpx;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+
+.desc {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.section {
+  margin-top: 16rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.itinerary-item {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.itinerary-item:last-child {
+  border-bottom: none;
+}
+
+.day-label {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.day-desc {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.picker-value {
+  padding: 16rpx 24rpx;
+  background: var(--color-bg);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.counter-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border: 2rpx solid var(--color-border);
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+.counter-value {
+  font-size: 32rpx;
+  font-weight: 500;
+  min-width: 48rpx;
+  text-align: center;
+}
+
+.form-input {
+  padding: 16rpx 24rpx;
+  background: var(--color-bg);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.bottom-info {
+  flex: 1;
+}
+
+.bottom-price {
+  font-size: 26rpx;
+  color: var(--color-orange);
+}
+
+.bottom-price .big {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.book-btn {
+  width: 240rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 999rpx;
+  border: none;
+}
+
+.book-btn::after {
+  border: none;
+}

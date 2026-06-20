@@ -1,0 +1,38 @@
+<!--pages/travel/list.wxml-->
+<view class="page">
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{tab === 'ticket' ? 'active' : ''}}" bind:tap="onTabChange" data-tab="ticket">景区门票</view>
+    <view class="tab-item {{tab === 'route' ? 'active' : ''}}" bind:tap="onTabChange" data-tab="route">路线套餐</view>
+  </view>
+
+  <!-- 门票列表 -->
+  <view wx:if="{{tab === 'ticket'}}" class="list">
+    <view class="ticket-card card" wx:for="{{tickets}}" wx:key="id" bind:tap="onTicketTap" data-id="{{item.id}}">
+      <image class="ticket-img" src="{{item.mainImage}}" mode="aspectFill" />
+      <view class="ticket-info">
+        <text class="ticket-name">{{item.name}}</text>
+        <text class="ticket-addr text-ellipsis text-tertiary">📍 {{item.address}}</text>
+        <view class="ticket-bottom">
+          <text class="price"><text class="price-symbol">¥</text>{{item.price}}<text class="text-tertiary">起</text></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 路线列表 -->
+  <view wx:if="{{tab === 'route'}}" class="list">
+    <view class="route-card card" wx:for="{{routes}}" wx:key="id" bind:tap="onRouteTap" data-id="{{item.id}}">
+      <image class="route-img" src="{{item.mainImage}}" mode="aspectFill" />
+      <view class="route-info">
+        <text class="route-title">{{item.title}}</text>
+        <text class="route-meta text-tertiary">{{item.days}}天游 · {{item.themeTags}}</text>
+        <text class="price"><text class="price-symbol">¥</text>{{item.price}}<text class="text-tertiary">/人</text></text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-tip">
+    <text class="text-tertiary">加载中...</text>
+  </view>
+</view>

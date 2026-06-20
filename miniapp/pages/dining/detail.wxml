@@ -1,0 +1,84 @@
+<!--pages/dining/detail.wxml-->
+<view class="page" wx:if="{{restaurant}}">
+  <!-- 餐厅图片 -->
+  <image class="cover-img" src="{{restaurant.mainImage}}" mode="aspectFill" />
+
+  <!-- 餐厅信息 -->
+  <view class="info card">
+    <text class="name">{{restaurant.name}}</text>
+    <view class="meta">
+      <text class="rating">⭐ {{restaurant.rating}}</text>
+      <text class="text-tertiary">容纳{{restaurant.capacity}}人</text>
+    </view>
+    <text class="addr text-tertiary">📍 {{restaurant.address}}</text>
+    <text class="time text-tertiary" wx:if="{{restaurant.openTime}}">🕐 {{restaurant.openTime}}</text>
+    <text class="intro" wx:if="{{restaurant.introduction}}">{{restaurant.introduction}}</text>
+  </view>
+
+  <!-- 招牌菜 -->
+  <view class="section card" wx:if="{{dishes.length > 0}}">
+    <text class="section-title">招牌菜品</text>
+    <view class="dish-list">
+      <view class="dish-item" wx:for="{{dishes}}" wx:key="id">
+        <image class="dish-img" src="{{item.mainImage}}" mode="aspectFill" />
+        <view class="dish-info">
+          <text class="dish-name">{{item.name}}</text>
+          <text class="price"><text class="price-symbol">¥</text>{{item.price}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 餐位预订 -->
+  <view class="section card">
+    <text class="section-title">餐位预订</text>
+
+    <!-- 日期选择 -->
+    <view class="form-item">
+      <text class="form-label">预订日期</text>
+      <picker mode="date" value="{{selectedDate}}" start="{{selectedDate}}" bind:change="onDateChange">
+        <view class="picker-value">{{selectedDate}}</view>
+      </picker>
+    </view>
+
+    <!-- 时段选择 -->
+    <view class="form-item">
+      <text class="form-label">选择时段</text>
+      <view class="slot-list">
+        <view
+          class="slot-tag {{selectedSlot.id === item.id ? 'active' : ''}}"
+          wx:for="{{timeSlots}}"
+          wx:key="id"
+          bind:tap="onSlotTap"
+          data-slot="{{item}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 人数 -->
+    <view class="form-item">
+      <text class="form-label">用餐人数</text>
+      <view class="counter">
+        <view class="counter-btn" bind:tap="onGuestCountChange" data-type="minus">-</view>
+        <text class="counter-value">{{guestCount}}</text>
+        <view class="counter-btn" bind:tap="onGuestCountChange" data-type="plus">+</view>
+      </view>
+    </view>
+
+    <!-- 联系人 -->
+    <view class="form-item">
+      <text class="form-label">联系人</text>
+      <input class="form-input" placeholder="请输入姓名" value="{{contactName}}" bind:input="onNameInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">联系电话</text>
+      <input class="form-input" type="number" placeholder="请输入手机号" value="{{contactPhone}}" bind:input="onPhoneInput" />
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-bar">
+    <button class="book-btn" bind:tap="onBook">立即预订</button>
+  </view>
+</view>

@@ -1,0 +1,58 @@
+<!--pages/order/detail.wxml-->
+<view class="page" wx:if="{{order}}">
+  <!-- 状态栏 -->
+  <view class="status-bar {{order.status}}">
+    <text class="status-text">{{order.statusText}}</text>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="section card">
+    <text class="section-title">订单信息</text>
+    <view class="info-row">
+      <text class="info-label">订单号</text>
+      <text class="info-value">{{order.orderNo}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">下单时间</text>
+      <text class="info-value">{{order.createdAt}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.payTime}}">
+      <text class="info-label">支付时间</text>
+      <text class="info-value">{{order.payTime}}</text>
+    </view>
+  </view>
+
+  <!-- 商品信息 -->
+  <view class="section card">
+    <text class="section-title">商品信息</text>
+    <view class="order-item" wx:for="{{order.items}}" wx:key="id">
+      <image class="item-img" src="{{item.productImage}}" mode="aspectFill" />
+      <view class="item-info">
+        <text class="item-name">{{item.productName}}</text>
+        <text class="item-spec text-tertiary" wx:if="{{item.skuName}}">{{item.skuName}}</text>
+      </view>
+      <view class="item-right">
+        <text class="item-price">¥{{item.price}}</text>
+        <text class="item-qty text-tertiary">x{{item.quantity}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 金额 -->
+  <view class="section card">
+    <view class="info-row">
+      <text class="info-label">商品合计</text>
+      <text class="info-value">¥{{order.totalAmount}}</text>
+    </view>
+    <view class="info-row total-row">
+      <text class="info-label text-bold">实付金额</text>
+      <text class="price total-price">¥{{order.payAmount || order.totalAmount}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-bar" wx:if="{{order.status === 'PENDING_PAYMENT'}}">
+    <button class="btn-cancel" bind:tap="onCancel">取消订单</button>
+    <button class="btn-pay" bind:tap="onPay">立即支付</button>
+  </view>
+</view>

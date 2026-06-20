@@ -1,0 +1,79 @@
+<!--pages/clothing/detail.wxml-->
+<view class="page" wx:if="{{product}}">
+  <!-- 商品图片轮播 -->
+  <swiper class="product-swiper" indicator-dots autoplay circular>
+    <swiper-item wx:for="{{product.images}}" wx:key="id">
+      <image class="product-img" src="{{item.imageUrl}}" mode="aspectFill" />
+    </swiper-item>
+    <swiper-item wx:if="{{!product.images || product.images.length === 0}}">
+      <image class="product-img" src="{{product.mainImage}}" mode="aspectFill" />
+    </swiper-item>
+  </swiper>
+
+  <!-- 商品信息 -->
+  <view class="product-info card">
+    <view class="price-row">
+      <text class="price"><text class="price-symbol">¥</text>{{currentSku.price || product.price}}</text>
+      <text wx:if="{{product.marketPrice}}" class="price-original">¥{{product.marketPrice}}</text>
+    </view>
+    <text class="product-title">{{product.title}}</text>
+    <text class="product-subtitle text-tertiary" wx:if="{{product.subtitle}}">{{product.subtitle}}</text>
+    <view class="product-meta">
+      <text class="text-tertiary">销量 {{product.sales}}</text>
+      <text class="text-tertiary">库存 {{currentSku.stock || product.stock}}</text>
+    </view>
+  </view>
+
+  <!-- 规格选择 -->
+  <view class="sku-section card" wx:if="{{product.skus && product.skus.length > 0}}">
+    <text class="section-label">规格</text>
+    <view class="sku-list">
+      <view
+        class="sku-tag {{currentSku.id === item.id ? 'active' : ''}}"
+        wx:for="{{product.skus}}"
+        wx:key="id"
+        bind:tap="onSkuTap"
+        data-sku="{{item}}"
+      >{{item.specName}}</view>
+    </view>
+  </view>
+
+  <!-- 工艺介绍 -->
+  <view class="craft-section card" wx:if="{{product.craftIntro}}">
+    <text class="section-label">工艺介绍</text>
+    <text class="craft-text">{{product.craftIntro}}</text>
+  </view>
+
+  <!-- 传承人故事 -->
+  <view class="artisan-section card" wx:if="{{product.artisanName}}">
+    <text class="section-label">传承人</text>
+    <view class="artisan-info">
+      <text class="artisan-name">{{product.artisanName}}</text>
+      <text class="artisan-story text-tertiary" wx:if="{{product.artisanStory}}">{{product.artisanStory}}</text>
+    </view>
+  </view>
+
+  <!-- 商品详情 -->
+  <view class="detail-section card" wx:if="{{product.detail}}">
+    <text class="section-label">商品详情</text>
+    <rich-text class="detail-content" nodes="{{product.detail}}"></rich-text>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bottom-left">
+      <view class="bottom-icon" bind:tap="onToggleFavorite">
+        <text>{{isFavorite ? '❤️' : '🤍'}}</text>
+        <text class="icon-label">收藏</text>
+      </view>
+      <view class="bottom-icon" bind:tap="onAddCart">
+        <text>🛒</text>
+        <text class="icon-label">购物车</text>
+      </view>
+    </view>
+    <view class="bottom-right">
+      <button class="btn-cart" bind:tap="onAddCart">加入购物车</button>
+      <button class="btn-buy" bind:tap="onBuyNow">立即购买</button>
+    </view>
+  </view>
+</view>

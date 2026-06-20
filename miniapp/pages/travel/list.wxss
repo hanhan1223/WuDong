@@ -1,0 +1,88 @@
+/* pages/travel/list.wxss */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid var(--color-border);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  position: relative;
+}
+
+.tab-item.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background: var(--color-primary);
+  border-radius: 2rpx;
+}
+
+.list {
+  padding: 16rpx 32rpx;
+}
+
+.ticket-card,
+.route-card {
+  display: flex;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.ticket-img,
+.route-img {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.ticket-info,
+.route-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.ticket-name,
+.route-title {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.ticket-addr,
+.route-meta {
+  font-size: 24rpx;
+}
+
+.ticket-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.loading-tip {
+  text-align: center;
+  padding: 40rpx 0;
+}
