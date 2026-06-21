@@ -1,5 +1,6 @@
 package com.wudong.config;
 
+import com.wudong.common.constants.SecurityConstants;
 import com.wudong.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,58 +25,18 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Swagger / OpenAPI
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/api-docs/**",
-                                "/v3/api-docs/**",
-                                "/webjars/**"
-                        ).permitAll()
-                        // Public endpoints
-                        .requestMatchers(
-                                "/api/health",
-                                "/api/users/register",
-                                "/api/users/login",
-                                "/api/users/send-sms",
-                                "/api/users/login-sms",
-                                "/api/admin/login"
-                        ).permitAll()
+                        .requestMatchers(SecurityConstants.SWAGGER_PATHS.toArray(new String[0])).permitAll()
+                        // Public endpoints (login/register)
+                        .requestMatchers(SecurityConstants.PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
                         // Public GET endpoints (browse without login)
                         .requestMatchers(HttpMethod.GET,
-                                "/api/products",
-                                "/api/products/hot",
-                                "/api/products/categories",
-                                "/api/products/{id}",
-                                "/api/restaurants",
-                                "/api/restaurants/{id}",
-                                "/api/restaurants/{id}/dishes",
-                                "/api/restaurants/{id}/timeslots",
-                                "/api/farm/categories",
-                                "/api/farm/products",
-                                "/api/farm/products/{id}",
-                                "/api/homestays",
-                                "/api/homestays/{id}",
-                                "/api/homestays/{id}/rooms",
-                                "/api/homestays/rooms/{roomId}/calendar",
-                                "/api/scenic-spots",
-                                "/api/scenic-spots/{id}",
-                                "/api/scenic-spots/{id}/tickets",
-                                "/api/routes",
-                                "/api/routes/{id}",
-                                "/api/transport-guides",
-                                "/api/e-tickets/{code}",
-                                "/api/posts",
-                                "/api/posts/{id}",
-                                "/api/posts/{id}/comments",
-                                "/api/topics",
-                                "/api/search"
-                        ).permitAll()
+                                SecurityConstants.PUBLIC_GET_ENDPOINTS.toArray(new String[0])).permitAll()
                         // Admin endpoints - ADMIN role only
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         // Merchant endpoints - MERCHANT or ADMIN role

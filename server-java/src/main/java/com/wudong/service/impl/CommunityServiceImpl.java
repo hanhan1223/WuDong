@@ -36,6 +36,7 @@ public class CommunityServiceImpl implements CommunityService {
      * 获取帖子列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Post> getPosts(String keyword, String topicId, Long userId, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return postRepository.searchByKeyword(keyword, pageable);
@@ -201,6 +202,7 @@ public class CommunityServiceImpl implements CommunityService {
      * 获取评论列表（分层，顶级评论 + 5条子评论）
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Comment> getComments(Long postId, Pageable pageable) {
         return commentRepository.findByPostIdAndParentIdNullAndStatusOrderByCreatedAtDesc(postId, CommentStatus.NORMAL, pageable);
     }
@@ -209,6 +211,7 @@ public class CommunityServiceImpl implements CommunityService {
      * 获取子评论
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Comment> getChildComments(Long parentId) {
         return commentRepository.findByParentIdAndStatusOrderByCreatedAtAsc(parentId, CommentStatus.NORMAL);
     }
@@ -249,6 +252,7 @@ public class CommunityServiceImpl implements CommunityService {
      * 获取话题列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Topic> getTopics(Pageable pageable) {
         return topicRepository.findByStatusTrueOrderByTopDescFollowCountDesc(pageable);
     }

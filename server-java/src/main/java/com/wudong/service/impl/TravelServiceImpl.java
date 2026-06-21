@@ -43,6 +43,7 @@ public class TravelServiceImpl implements TravelService {
      * 获取景点列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<ScenicSpot> getScenicSpots(String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return scenicSpotRepository.searchByKeyword(keyword, pageable);
@@ -54,6 +55,7 @@ public class TravelServiceImpl implements TravelService {
      * 获取景点详情
      */
     @Override
+    @Transactional(readOnly = true)
     public ScenicSpot getScenicSpotById(Long id) {
         String cacheKey = BusinessConstants.CACHE_PREFIX_SCENIC_SPOT + id;
         ScenicSpot spot = cacheService.get(cacheKey);
@@ -74,6 +76,7 @@ public class TravelServiceImpl implements TravelService {
      * 获取票种列表
      */
     @Override
+    @Transactional(readOnly = true)
     public List<TicketType> getTicketTypes(Long spotId) {
         return ticketTypeRepository.findBySpotIdAndStatusTrue(spotId);
     }
@@ -82,6 +85,7 @@ public class TravelServiceImpl implements TravelService {
      * 获取路线列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<TravelRoute> getRoutes(String keyword, String theme, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return travelRouteRepository.searchByKeyword(keyword, pageable);
@@ -96,6 +100,7 @@ public class TravelServiceImpl implements TravelService {
      * 获取路线详情
      */
     @Override
+    @Transactional(readOnly = true)
     public TravelRoute getRouteById(Long id) {
         String cacheKey = BusinessConstants.CACHE_PREFIX_ROUTE + id;
         TravelRoute route = cacheService.get(cacheKey);
@@ -116,6 +121,7 @@ public class TravelServiceImpl implements TravelService {
      * 获取交通指南
      */
     @Override
+    @Transactional(readOnly = true)
     public List<TransportGuide> getTransportGuides() {
         return transportGuideRepository.findByStatusTrueOrderBySortAsc();
     }
@@ -124,6 +130,7 @@ public class TravelServiceImpl implements TravelService {
      * 根据电子票码查询
      */
     @Override
+    @Transactional(readOnly = true)
     public ETicket getETicketByCode(String code) {
         return eTicketRepository.findByTicketCode(code)
                 .orElseThrow(() -> new BusinessException("电子票不存在", 404));

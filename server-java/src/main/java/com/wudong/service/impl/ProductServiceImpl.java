@@ -36,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
     /**
      * 获取商品列表
      */
+    @Transactional(readOnly = true)
     public Page<Product> getProducts(Long categoryId, String keyword, ProductStatus status, String orderBy, Pageable pageable) {
         ProductStatus queryStatus = status != null ? status : ProductStatus.ACTIVE;
 
@@ -56,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
     /**
      * 获取热门商品
      */
+    @Transactional(readOnly = true)
     public List<Product> getHotProducts(int limit) {
         String cacheKey = BusinessConstants.CACHE_PREFIX_HOT_PRODUCTS + ":" + limit;
         List<Product> products = cacheService.get(cacheKey);
@@ -71,6 +73,7 @@ public class ProductServiceImpl implements ProductService {
     /**
      * 获取分类树
      */
+    @Transactional(readOnly = true)
     public List<ProductCategory> getCategoryTree() {
         String cacheKey = BusinessConstants.CACHE_PREFIX_CATEGORY + "tree";
         List<ProductCategory> categories = cacheService.get(cacheKey);
@@ -86,6 +89,7 @@ public class ProductServiceImpl implements ProductService {
     /**
      * 获取商品详情
      */
+    @Transactional(readOnly = true)
     public Product getProductById(Long id) {
         String cacheKey = BusinessConstants.CACHE_PREFIX_PRODUCT + id;
         Product product = cacheService.get(cacheKey);

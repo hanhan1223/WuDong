@@ -17,6 +17,7 @@ com\wudong\dto\product\CreateProductRequest$SkuRequest.class
 com\wudong\dto\order\CreateOrderRequest$OrderItemRequest.class
 com\wudong\entity\TransportGuide.class
 com\wudong\entity\MerchantApplication.class
+com\wudong\dto\cart\ToggleSelectRequest.class
 com\wudong\dto\order\CancelOrderRequest.class
 com\wudong\common\enums\OrderType.class
 com\wudong\entity\Favorite.class
@@ -30,6 +31,7 @@ com\wudong\dto\common\ToggleFavoriteRequest.class
 com\wudong\entity\Post.class
 com\wudong\WudongApplication.class
 com\wudong\entity\SearchHistory.class
+com\wudong\dto\admin\CreateRecommendationRequest.class
 com\wudong\service\impl\TravelServiceImpl.class
 com\wudong\dto\homestay\BookRoomRequest.class
 com\wudong\common\exception\GlobalExceptionHandler.class
@@ -44,8 +46,10 @@ com\wudong\controller\CommunityController.class
 com\wudong\entity\Order.class
 com\wudong\entity\AdminUser.class
 com\wudong\repository\BannerRepository.class
+com\wudong\dto\admin\AddSensitiveWordRequest.class
 com\wudong\entity\Topic.class
 com\wudong\common\enums\RefundStatus.class
+com\wudong\dto\cart\AddToCartRequest.class
 com\wudong\service\LockService.class
 com\wudong\common\enums\CommentStatus.class
 com\wudong\config\SecurityConfig.class
@@ -122,6 +126,7 @@ com\wudong\dto\payment\CreatePaymentRequest.class
 com\wudong\entity\Restaurant.class
 com\wudong\common\converter\GenderConverter.class
 com\wudong\dto\admin\HandleReportRequest.class
+com\wudong\common\constants\SecurityConstants.class
 com\wudong\service\impl\PaymentServiceImpl.class
 com\wudong\entity\SystemConfig.class
 com\wudong\service\impl\AuthServiceImpl.class
@@ -158,6 +163,7 @@ com\wudong\common\enums\MessageType.class
 com\wudong\controller\BookingController.class
 com\wudong\entity\ProductSku.class
 com\wudong\service\impl\UploadServiceImpl.class
+com\wudong\dto\cart\UpdateCartRequest.class
 com\wudong\entity\CartItem.class
 com\wudong\service\OrderService.class
 com\wudong\service\RestaurantService.class
@@ -173,6 +179,7 @@ com\wudong\dto\user\LoginSmsRequest.class
 com\wudong\service\AdminService.class
 com\wudong\service\impl\CommunityServiceImpl.class
 com\wudong\entity\TimeSlot.class
+com\wudong\dto\cart\ToggleSelectAllRequest.class
 com\wudong\dto\product\UpdateProductRequest.class
 com\wudong\controller\UploadController.class
 com\wudong\service\FavoriteService.class
@@ -222,6 +229,7 @@ com\wudong\entity\Report.class
 com\wudong\dto\user\UpdateProfileRequest.class
 com\wudong\interceptor\SecurityInterceptor.class
 com\wudong\dto\common\ReplyReviewRequest.class
+com\wudong\dto\merchant\MerchantApplyRequest.class
 com\wudong\entity\Homestay.class
 com\wudong\common\enums\AdminStatus.class
 com\wudong\common\enums\UserStatus.class

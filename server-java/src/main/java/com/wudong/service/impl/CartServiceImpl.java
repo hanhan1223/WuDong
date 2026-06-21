@@ -60,6 +60,7 @@ public class CartServiceImpl implements CartService {
     /**
      * 获取购物车列表
      */
+    @Transactional(readOnly = true)
     public List<CartItem> getCartItems(Long userId) {
         return cartItemRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
@@ -111,6 +112,7 @@ public class CartServiceImpl implements CartService {
     /**
      * 获取选中的购物车项
      */
+    @Transactional(readOnly = true)
     public List<CartItem> getSelectedItems(Long userId) {
         return cartItemRepository.findByUserIdAndSelectedTrue(userId);
     }

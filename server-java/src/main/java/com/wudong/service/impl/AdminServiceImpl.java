@@ -70,6 +70,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<String, Object> getDashboard() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalUsers", userRepository.count());
@@ -81,6 +82,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<User> getUsers(String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return userRepository.findByNicknameContainingOrPhoneContaining(keyword, keyword, pageable);
@@ -98,6 +100,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Merchant> getMerchants(MerchantStatus status, Pageable pageable) {
         if (status != null) {
             return merchantRepository.findByStatus(status, pageable);
@@ -125,6 +128,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Order> getOrders(OrderStatus status, OrderType orderType, Pageable pageable) {
         if (status != null) {
             return orderRepository.findByStatus(status, pageable);
@@ -136,6 +140,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<FinanceRecord> getFinanceRecords(Long merchantId, FinanceStatus status, Pageable pageable) {
         if (merchantId != null && status != null) {
             return financeRecordRepository.findByMerchantIdAndStatus(merchantId, status, pageable);
@@ -161,6 +166,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Report> getReports(ReportStatus status, Pageable pageable) {
         if (status != null) {
             return reportRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
@@ -182,6 +188,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Announcement> getAnnouncements() {
         return announcementRepository.findByStatusTrueOrderByCreatedAtDesc();
     }
@@ -197,6 +204,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Banner> getBanners() {
         return bannerRepository.findByStatusTrueOrderBySortAsc();
     }
@@ -215,6 +223,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SystemConfig> getConfigs() {
         return systemConfigRepository.findAll();
     }
@@ -234,6 +243,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<MerchantApplication> getMerchantApplications(MerchantStatus status, Pageable pageable) {
         if (status != null) {
             return merchantApplicationRepository.findByStatus(status, pageable);
@@ -275,11 +285,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OperationLog> getLogs(Pageable pageable) {
         return operationLogRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Recommendation> getRecommendations() {
         return recommendationRepository.findByStatusTrueOrderBySortAsc();
     }
@@ -298,6 +310,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SensitiveWord> getSensitiveWords() {
         return sensitiveWordRepository.findAll();
     }

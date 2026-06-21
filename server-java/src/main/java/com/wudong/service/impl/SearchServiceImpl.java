@@ -77,6 +77,7 @@ public class SearchServiceImpl implements SearchService {
      * 获取搜索历史
      */
     @Override
+    @Transactional(readOnly = true)
     public List<SearchHistory> getSearchHistory(Long userId) {
         return searchHistoryRepository.findDistinctKeywordsByUserId(userId, PageRequest.of(0, 20));
     }

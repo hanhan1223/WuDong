@@ -41,6 +41,7 @@ public class MessageServiceImpl implements MessageService {
      * 获取消息列表（支持组合过滤）
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Message> getMessages(Long userId, MessageType type, Boolean isRead, Pageable pageable) {
         if (type != null && isRead != null) {
             return messageRepository.findByUserIdAndTypeAndReadOrderByCreatedAtDesc(userId, type, isRead, pageable);
@@ -84,6 +85,7 @@ public class MessageServiceImpl implements MessageService {
      * 获取未读消息数
      */
     @Override
+    @Transactional(readOnly = true)
     public long getUnreadCount(Long userId) {
         return messageRepository.countByUserIdAndReadFalse(userId);
     }

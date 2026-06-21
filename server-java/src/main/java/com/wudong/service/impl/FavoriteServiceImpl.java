@@ -47,6 +47,7 @@ public class FavoriteServiceImpl implements FavoriteService {
      * 获取收藏列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Favorite> getFavorites(Long userId, FavoriteTargetType targetType, Pageable pageable) {
         if (targetType != null) {
             return favoriteRepository.findByUserIdAndTargetTypeOrderByCreatedAtDesc(userId, targetType, pageable);
@@ -58,6 +59,7 @@ public class FavoriteServiceImpl implements FavoriteService {
      * 检查是否已收藏
      */
     @Override
+    @Transactional(readOnly = true)
     public boolean isFavorited(Long userId, FavoriteTargetType targetType, Long targetId) {
         return favoriteRepository.existsByUserIdAndTargetTypeAndTargetId(userId, targetType, targetId);
     }

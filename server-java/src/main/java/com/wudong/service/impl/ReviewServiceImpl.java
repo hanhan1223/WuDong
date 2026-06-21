@@ -54,6 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
     /**
      * 获取评价列表（按目标）
      */
+    @Transactional(readOnly = true)
     public Page<Review> getReviews(TargetType targetType, Long targetId, Pageable pageable) {
         return reviewRepository.findByTargetTypeAndTargetIdAndStatusOrderByCreatedAtDesc(targetType, targetId, ContentType.NORMAL, pageable);
     }

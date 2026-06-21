@@ -34,6 +34,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取餐厅列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Restaurant> getRestaurants(String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return restaurantRepository.searchByKeyword(keyword, pageable);
@@ -45,6 +46,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取餐厅详情
      */
     @Override
+    @Transactional(readOnly = true)
     public Restaurant getRestaurantById(Long id) {
         String cacheKey = com.wudong.common.constants.BusinessConstants.CACHE_PREFIX_RESTAURANT + id;
         Restaurant restaurant = cacheService.get(cacheKey);
@@ -67,6 +69,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取餐厅菜品
      */
     @Override
+    @Transactional(readOnly = true)
     public List<RestaurantDish> getDishes(Long restaurantId) {
         return dishRepository.findByRestaurantIdAndStatusTrue(restaurantId);
     }
@@ -75,6 +78,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取可用预订时段
      */
     @Override
+    @Transactional(readOnly = true)
     public List<TimeSlot> getTimeSlots(Long restaurantId) {
         return timeSlotRepository.findByRestaurantIdAndStatusTrue(restaurantId);
     }
@@ -118,6 +122,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取用户预订列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<TableBooking> getUserBookings(Long userId, Pageable pageable) {
         return bookingRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
@@ -147,6 +152,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取农产品分类
      */
     @Override
+    @Transactional(readOnly = true)
     public List<FarmCategory> getFarmCategories() {
         return farmCategoryRepository.findByStatusTrueOrderBySortAsc();
     }
@@ -155,6 +161,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取农产品列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<FarmProduct> getFarmProducts(Long categoryId, String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             if (categoryId != null) {
@@ -172,6 +179,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      * 获取农产品详情
      */
     @Override
+    @Transactional(readOnly = true)
     public FarmProduct getFarmProductById(Long id) {
         return farmProductRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("农产品不存在", 404));

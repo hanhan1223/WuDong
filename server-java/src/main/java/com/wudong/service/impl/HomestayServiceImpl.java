@@ -44,6 +44,7 @@ public class HomestayServiceImpl implements HomestayService {
      * 获取民宿列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Homestay> getHomestays(String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return homestayRepository.searchByKeyword(keyword, pageable);
@@ -55,6 +56,7 @@ public class HomestayServiceImpl implements HomestayService {
      * 获取民宿详情
      */
     @Override
+    @Transactional(readOnly = true)
     public Homestay getHomestayById(Long id) {
         String cacheKey = BusinessConstants.CACHE_PREFIX_HOMESTAY + id;
         Homestay homestay = cacheService.get(cacheKey);
@@ -77,6 +79,7 @@ public class HomestayServiceImpl implements HomestayService {
      * 获取房型列表
      */
     @Override
+    @Transactional(readOnly = true)
     public List<RoomType> getRoomTypes(Long homestayId) {
         return roomTypeRepository.findByHomestayIdAndStatus(homestayId, true);
     }
@@ -85,6 +88,7 @@ public class HomestayServiceImpl implements HomestayService {
      * 获取房型日历（可用性）
      */
     @Override
+    @Transactional(readOnly = true)
     public List<RoomCalendar> getRoomCalendar(Long roomTypeId, LocalDate startDate, LocalDate endDate) {
         String cacheKey = BusinessConstants.CACHE_PREFIX_ROOM_CALENDAR + roomTypeId + ":" + startDate + ":" + endDate;
         List<RoomCalendar> calendar = cacheService.get(cacheKey);

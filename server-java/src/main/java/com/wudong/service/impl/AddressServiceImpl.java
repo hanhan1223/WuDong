@@ -24,6 +24,7 @@ public class AddressServiceImpl implements AddressService {
      * 获取用户地址列表
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Address> getAddresses(Long userId) {
         return addressRepository.findByUserIdOrderByDefaultedDescCreatedAtDesc(userId);
     }
