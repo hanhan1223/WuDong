@@ -1,4 +1,4 @@
-import { UserService } from "../service/user.service";
+import { UserService } from "../../src/service/user.service";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 

@@ -1,7 +1,7 @@
-import { OrderService } from "../service/order.service";
+import { OrderService } from "../../src/service/order.service";
 
 // 创建 mock Prisma 对象
-const createMockPrisma = () => ({
+const createMockPrisma = (): Record<string, any> => ({
   order: {
     findUnique: jest.fn(),
     findMany: jest.fn(),
@@ -18,7 +18,9 @@ const createMockPrisma = () => ({
     create: jest.fn(),
     findUnique: jest.fn(),
   },
-  $transaction: jest.fn((callback: any) => callback(createMockPrisma())),
+  $transaction: jest.fn((callback: (prisma: any) => any) =>
+    callback(createMockPrisma()),
+  ),
 });
 
 describe("OrderService", () => {
