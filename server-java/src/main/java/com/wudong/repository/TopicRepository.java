@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long> {
 
-    List<Topic> findByStatusTrueOrderByIsTopDescFollowCountDesc();
+    List<Topic> findByStatusTrueOrderByTopDescFollowCountDesc();
 
-    Page<Topic> findByStatusTrueOrderByIsTopDescFollowCountDesc(Pageable pageable);
+    Page<Topic> findByStatusTrueOrderByTopDescFollowCountDesc(Pageable pageable);
 
-    List<Topic> findByIsRecommendTrueAndStatusTrue();
+    List<Topic> findByRecommendTrueAndStatusTrue();
 }

@@ -250,7 +250,7 @@ public class CommunityServiceImpl implements CommunityService {
      */
     @Override
     public Page<Topic> getTopics(Pageable pageable) {
-        return topicRepository.findByStatusTrueOrderByIsTopDescFollowCountDesc(pageable);
+        return topicRepository.findByStatusTrueOrderByTopDescFollowCountDesc(pageable);
     }
 
     /**

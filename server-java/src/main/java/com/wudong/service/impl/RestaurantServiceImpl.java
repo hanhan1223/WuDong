@@ -46,7 +46,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      */
     @Override
     public Restaurant getRestaurantById(Long id) {
-        String cacheKey = "restaurant:" + id;
+        String cacheKey = com.wudong.common.constants.BusinessConstants.CACHE_PREFIX_RESTAURANT + id;
         Restaurant restaurant = cacheService.get(cacheKey);
         if (restaurant != null) {
             return restaurant;

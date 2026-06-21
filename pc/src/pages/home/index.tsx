@@ -139,32 +139,45 @@ export default function Home() {
 
   const loadData = async () => {
     setLoading(true);
-    const results = await Promise.allSettled([
-      get<Banner[]>("/banners"),
-      get<{ list: Product[] }>("/api/products", {
-        pageSize: 8,
-        orderBy: "sales",
-      }),
-      get<{ list: Restaurant[] }>("/api/restaurants", { pageSize: 4 }),
-      get<{ list: Homestay[] }>("/api/homestays", { pageSize: 4 }),
-      get<{ list: ScenicSpot[] }>("/api/scenic-spots", { pageSize: 4 }),
-      get<{ list: Post[] }>("/api/posts", { pageSize: 6 }),
-    ]);
+    try {
+      const results = await Promise.allSettled([
+        get<Banner[]>("/banners"),
+        get<{ list: Product[] }>("/api/products", {
+          pageSize: 4,
+          orderBy: "sales",
+        }),
+        get<{ list: Restaurant[] }>("/api/restaurants", { pageSize: 4 }),
+        get<{ list: Homestay[] }>("/api/homestays", { pageSize: 4 }),
+        get<{ list: ScenicSpot[] }>("/api/scenic-spots", { pageSize: 4 }),
+        get<{ list: Post[] }>("/api/posts", { pageSize: 6 }),
+      ]);
 
-    const extract = <T,>(r: PromiseSettledResult<T>, fallback: T): T =>
-      r.status === "fulfilled" ? r.value : fallback;
+      const extract = <T,>(r: PromiseSettledResult<T>, fallback: T): T =>
+        r.status === "fulfilled" ? r.value : fallback;
 
-    setBanners(extract(results[0], []));
-    setHotProducts(extract(results[1], { list: [] }).list || []);
-    setRestaurants(extract(results[2], { list: [] }).list || []);
-    setHomestays(extract(results[3], { list: [] }).list || []);
-    setScenicSpots(extract(results[4], { list: [] }).list || []);
-    setPosts(extract(results[5], { list: [] }).list || []);
-    setLoading(false);
+      setBanners(extract(results[0], []));
+      setHotProducts(extract(results[1], { list: [] }).list || []);
+      setRestaurants(extract(results[2], { list: [] }).list || []);
+      setHomestays(extract(results[3], { list: [] }).list || []);
+      setScenicSpots(extract(results[4], { list: [] }).list || []);
+      setPosts(extract(results[5], { list: [] }).list || []);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /** 通用卡片尺寸 */
   const cardImgHeight = screens.md ? 200 : 150;
+
+  /** 图片加载失败降级 */
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    img.style.display = "none";
+    const fallback = document.createElement("div");
+    fallback.style.cssText = `width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#bbb;font-size:32px;`;
+    fallback.textContent = "🖼";
+    img.parentElement?.appendChild(fallback);
+  };
 
   return (
     <>
@@ -325,6 +338,8 @@ export default function Home() {
                         <img
                           alt={p.title}
                           src={p.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -380,6 +395,8 @@ export default function Home() {
                         <img
                           alt={r.name}
                           src={r.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -447,6 +464,8 @@ export default function Home() {
                         <img
                           alt={h.name}
                           src={h.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -514,6 +533,8 @@ export default function Home() {
                         <img
                           alt={s.name}
                           src={s.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -576,6 +597,8 @@ export default function Home() {
                             <img
                               alt={post.title}
                               src={coverUrl}
+                              loading="lazy"
+                              onError={handleImgError}
                               style={{
                                 width: "100%",
                                 height: "100%",

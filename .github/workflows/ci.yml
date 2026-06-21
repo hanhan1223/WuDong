@@ -1,0 +1,134 @@
+# 乌东文旅 CI/CD Pipeline
+# 触发条件：push 到 main/develop 或 PR 到 main
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # ===== 后端检查 =====
+  server-lint:
+    name: Server - Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+
+  server-test:
+    name: Server - Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test123456
+          MYSQL_DATABASE: wudong_tourism_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm test
+        env:
+          DATABASE_URL: mysql://root:test123456@localhost:3306/wudong_tourism_test
+
+  server-build:
+    name: Server - Build
+    runs-on: ubuntu-latest
+    needs: [server-lint, server-test]
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  # ===== 前端检查 =====
+  admin-lint:
+    name: Admin - Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+  admin-build:
+    name: Admin - Build
+    runs-on: ubuntu-latest
+    needs: [admin-lint]
+    defaults:
+      run:
+        working-directory: ./admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  # ===== Docker 构建（仅 main 分支）=====
+  docker-build:
+    name: Docker - Build
+    runs-on: ubuntu-latest
+    needs: [server-build, admin-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          push: false
+          tags: wudong-server:latest
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./admin
+          push: false
+          tags: wudong-admin:latest
