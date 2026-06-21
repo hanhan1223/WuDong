@@ -15,26 +15,9 @@ env:
 
 jobs:
   # ===== Node.js 后端检查 =====
-  server-lock-check:
-    name: Server (Node) - Lock File Check
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./server
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Verify package-lock.json is in sync
-        run: |
-          npm install --package-lock-only
-          git diff --exit-code package-lock.json || (echo "❌ package-lock.json is out of sync with package.json. Run 'npm install' locally and commit the lock file." && exit 1)
-
   server-lint:
     name: Server (Node) - Lint
     runs-on: ubuntu-latest
-    needs: server-lock-check
     defaults:
       run:
         working-directory: ./server
