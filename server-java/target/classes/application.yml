@@ -1,0 +1,67 @@
+server:
+  port: ${SERVER_PORT:7002}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: wudong-server
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: false
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 604800000 # 7 days in milliseconds
+
+# Upload Configuration
+upload:
+  max-size: 5242880 # 5MB
+  allowed-types: jpg,jpeg,png,webp,gif
+
+# CORS Configuration
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:8080,http://localhost:5173}
+
+# Swagger / OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  group-configs:
+    - group: 用户
+      paths-to-match: /api/users/**
+    - group: 商品
+      paths-to-match: /api/products/**
+    - group: 订单
+      paths-to-match: /api/orders/**
+    - group: 购物车
+      paths-to-match: /api/cart/**
+    - group: 餐厅
+      paths-to-match: /api/restaurants/**,/api/bookings/**,/api/farm/**
+    - group: 民宿
+      paths-to-match: /api/homestays/**
+    - group: 旅游
+      paths-to-match: /api/scenic-spots/**,/api/routes/**,/api/transport-guides/**,/api/e-tickets/**,/api/tickets/**
+    - group: 社区
+      paths-to-match: /api/posts/**,/api/comments/**,/api/topics/**,/api/users/*/follow
+    - group: 管理后台
+      paths-to-match: /api/admin/**,/api/merchant/**,/api/payments/**,/api/upload/**,/api/search/**,/api/reviews/**,/api/favorites/**,/api/messages/**,/api/addresses/**,/api/health

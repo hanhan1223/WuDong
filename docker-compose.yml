@@ -71,6 +71,31 @@ services:
     depends_on:
       - server
 
+  # 后端 API 服务 (Java + Spring Boot 版本)
+  server-java:
+    build:
+      context: ./server-java
+      dockerfile: Dockerfile
+    container_name: wudong-server-java
+    restart: always
+    ports:
+      - "7002:7002"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: wudong_tourism
+      DB_USERNAME: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123456}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-wudong-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   # PC端前端
   pc:
     build:
