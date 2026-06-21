@@ -82,8 +82,9 @@ export default function ContentManage() {
           pageSize: 20,
         },
       );
-      setAnnouncements(res || []);
-      setAnnouncementTotal(0);
+      const data = Array.isArray(res) ? res : res?.list || [];
+      setAnnouncements(data);
+      setAnnouncementTotal(Array.isArray(res) ? data.length : res?.total || 0);
     } catch (err: any) {
       message.error(err?.message || "加载公告列表失败");
     } finally {
@@ -115,8 +116,9 @@ export default function ContentManage() {
         page: currentPage,
         pageSize: 20,
       });
-      setBanners(res || []);
-      setBannerTotal(0);
+      const data = Array.isArray(res) ? res : res?.list || [];
+      setBanners(data);
+      setBannerTotal(Array.isArray(res) ? data.length : res?.total || 0);
     } catch (err: any) {
       message.error(err?.message || "加载轮播图列表失败");
     } finally {
