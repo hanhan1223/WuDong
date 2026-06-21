@@ -6,6 +6,7 @@ import com.wudong.entity.*;
 import com.wudong.repository.*;
 import com.wudong.security.JwtTokenProvider;
 import com.wudong.service.AdminService;
+import com.wudong.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,8 @@ public class AdminServiceImpl implements AdminService {
     private final OperationLogRepository operationLogRepository;
     private final MerchantApplicationRepository merchantApplicationRepository;
     private final PostRepository postRepository;
+    private final RefundRepository refundRepository;
+    private final PaymentService paymentService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -70,6 +73,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<String, Object> getDashboard() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalUsers", userRepository.count());
@@ -81,6 +85,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<User> getUsers(String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return userRepository.findByNicknameContainingOrPhoneContaining(keyword, keyword, pageable);
@@ -98,6 +103,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Merchant> getMerchants(MerchantStatus status, Pageable pageable) {
         if (status != null) {
             return merchantRepository.findByStatus(status, pageable);
@@ -125,6 +131,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Order> getOrders(OrderStatus status, OrderType orderType, Pageable pageable) {
         if (status != null) {
             return orderRepository.findByStatus(status, pageable);
@@ -136,6 +143,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<FinanceRecord> getFinanceRecords(Long merchantId, FinanceStatus status, Pageable pageable) {
         if (merchantId != null && status != null) {
             return financeRecordRepository.findByMerchantIdAndStatus(merchantId, status, pageable);
@@ -161,6 +169,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Report> getReports(ReportStatus status, Pageable pageable) {
         if (status != null) {
             return reportRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
@@ -182,6 +191,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Announcement> getAnnouncements() {
         return announcementRepository.findByStatusTrueOrderByCreatedAtDesc();
     }
@@ -197,6 +207,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Banner> getBanners() {
         return bannerRepository.findByStatusTrueOrderBySortAsc();
     }
@@ -215,6 +226,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SystemConfig> getConfigs() {
         return systemConfigRepository.findAll();
     }
@@ -234,6 +246,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<MerchantApplication> getMerchantApplications(MerchantStatus status, Pageable pageable) {
         if (status != null) {
             return merchantApplicationRepository.findByStatus(status, pageable);
@@ -275,11 +288,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OperationLog> getLogs(Pageable pageable) {
         return operationLogRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Recommendation> getRecommendations() {
         return recommendationRepository.findByStatusTrueOrderBySortAsc();
     }
@@ -298,6 +313,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SensitiveWord> getSensitiveWords() {
         return sensitiveWordRepository.findAll();
     }
@@ -314,5 +330,25 @@ public class AdminServiceImpl implements AdminService {
         sensitiveWord.setLevel(level != null ? level : 1);
         sensitiveWord.setStatus(true);
         return sensitiveWordRepository.save(sensitiveWord);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Refund> getRefunds(RefundStatus status, Pageable pageable) {
+        if (status != null) {
+            return refundRepository.findByStatus(status, pageable);
+        }
+        return refundRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional
+    public void approveRefund(Long refundId) {
+        Refund refund = refundRepository.findById(refundId)
+                .orElseThrow(() -> new BusinessException("退款记录不存在", 404));
+        if (refund.getStatus() != RefundStatus.PENDING) {
+            throw new BusinessException("该退款不在待审批状态");
+        }
+        paymentService.handleRefundSuccess(refund.getOrder().getId());
     }
 }

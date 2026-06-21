@@ -97,6 +97,22 @@ public class AdminController {
         return ApiResponse.success(null, "结算成功");
     }
 
+    @Operation(summary = "获取退款列表")
+    @GetMapping("/refunds")
+    public ApiResponse<Page<Refund>> getRefunds(
+            @RequestParam(required = false) RefundStatus status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        return ApiResponse.success(adminService.getRefunds(status, PageRequest.of(page - 1, pageSize)));
+    }
+
+    @Operation(summary = "审批退款")
+    @PostMapping("/refunds/{id}/approve")
+    public ApiResponse<Void> approveRefund(@PathVariable Long id) {
+        adminService.approveRefund(id);
+        return ApiResponse.success(null, "退款已批准");
+    }
+
     @Operation(summary = "获取举报列表")
     @GetMapping("/reports")
     public ApiResponse<Page<Report>> getReports(
@@ -185,13 +201,10 @@ public class AdminController {
 
     @Operation(summary = "创建推荐")
     @PostMapping("/recommendations")
-    public ApiResponse<Recommendation> createRecommendation(@RequestBody Map<String, Object> body) {
+    public ApiResponse<Recommendation> createRecommendation(@Valid @RequestBody CreateRecommendationRequest request) {
         return ApiResponse.success(adminService.createRecommendation(
-                body.get("name").toString(),
-                body.get("targetType").toString(),
-                Long.valueOf(body.get("targetId").toString()),
-                body.get("module") != null ? body.get("module").toString() : null,
-                body.get("sort") != null ? Integer.valueOf(body.get("sort").toString()) : 0));
+                request.getName(), request.getTargetType(), request.getTargetId(),
+                request.getModule(), request.getSort()));
     }
 
     @Operation(summary = "获取敏感词列表")
@@ -202,9 +215,7 @@ public class AdminController {
 
     @Operation(summary = "添加敏感词")
     @PostMapping("/sensitive-words")
-    public ApiResponse<SensitiveWord> addSensitiveWord(@RequestBody Map<String, Object> body) {
-        return ApiResponse.success(adminService.addSensitiveWord(
-                body.get("word").toString(),
-                body.get("level") != null ? Integer.valueOf(body.get("level").toString()) : 1));
+    public ApiResponse<SensitiveWord> addSensitiveWord(@Valid @RequestBody AddSensitiveWordRequest request) {
+        return ApiResponse.success(adminService.addSensitiveWord(request.getWord(), request.getLevel()));
     }
 }

@@ -57,7 +57,11 @@ public class OrderController {
     @Operation(summary = "获取订单详情")
     @GetMapping("/{id}")
     public ApiResponse<Order> getOrder(@PathVariable Long id) {
+        Long userId = SecurityUtils.getCurrentUserId();
         Order order = orderService.getOrderById(id);
+        if (!order.getUser().getId().equals(userId) && !SecurityUtils.isAdmin()) {
+            throw new com.wudong.common.exception.BusinessException("无权查看此订单", 403);
+        }
         return ApiResponse.success(order);
     }
 
@@ -80,6 +84,11 @@ public class OrderController {
     @Operation(summary = "完成订单")
     @PostMapping("/{id}/complete")
     public ApiResponse<Void> completeOrder(@PathVariable Long id) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Order order = orderService.getOrderById(id);
+        if (!order.getUser().getId().equals(userId) && !SecurityUtils.isAdmin()) {
+            throw new com.wudong.common.exception.BusinessException("无权操作此订单", 403);
+        }
         orderService.completeOrder(id);
         return ApiResponse.success(null, "订单已完成");
     }

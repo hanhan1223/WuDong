@@ -6,7 +6,7 @@ import {
   Card,
   Carousel,
   Typography,
-  Spin,
+  Skeleton,
   Rate,
   Tag,
   Space,
@@ -139,108 +139,130 @@ export default function Home() {
 
   const loadData = async () => {
     setLoading(true);
-    const results = await Promise.allSettled([
-      get<Banner[]>("/banners"),
-      get<{ list: Product[] }>("/api/products", {
-        pageSize: 8,
-        orderBy: "sales",
-      }),
-      get<{ list: Restaurant[] }>("/api/restaurants", { pageSize: 4 }),
-      get<{ list: Homestay[] }>("/api/homestays", { pageSize: 4 }),
-      get<{ list: ScenicSpot[] }>("/api/scenic-spots", { pageSize: 4 }),
-      get<{ list: Post[] }>("/api/posts", { pageSize: 6 }),
-    ]);
+    try {
+      const results = await Promise.allSettled([
+        get<Banner[]>("/banners"),
+        get<{ list: Product[] }>("/api/products", {
+          pageSize: 4,
+          orderBy: "sales",
+        }),
+        get<{ list: Restaurant[] }>("/api/restaurants", { pageSize: 4 }),
+        get<{ list: Homestay[] }>("/api/homestays", { pageSize: 4 }),
+        get<{ list: ScenicSpot[] }>("/api/scenic-spots", { pageSize: 4 }),
+        get<{ list: Post[] }>("/api/posts", { pageSize: 6 }),
+      ]);
 
-    const extract = <T,>(r: PromiseSettledResult<T>, fallback: T): T =>
-      r.status === "fulfilled" ? r.value : fallback;
+      const extract = <T,>(r: PromiseSettledResult<T>, fallback: T): T =>
+        r.status === "fulfilled" ? r.value : fallback;
 
-    setBanners(extract(results[0], []));
-    setHotProducts(extract(results[1], { list: [] }).list || []);
-    setRestaurants(extract(results[2], { list: [] }).list || []);
-    setHomestays(extract(results[3], { list: [] }).list || []);
-    setScenicSpots(extract(results[4], { list: [] }).list || []);
-    setPosts(extract(results[5], { list: [] }).list || []);
-    setLoading(false);
+      setBanners(extract(results[0], []));
+      setHotProducts(extract(results[1], { list: [] }).list || []);
+      setRestaurants(extract(results[2], { list: [] }).list || []);
+      setHomestays(extract(results[3], { list: [] }).list || []);
+      setScenicSpots(extract(results[4], { list: [] }).list || []);
+      setPosts(extract(results[5], { list: [] }).list || []);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /** 通用卡片尺寸 */
   const cardImgHeight = screens.md ? 200 : 150;
 
+  /** 图片加载失败降级 */
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    img.style.display = "none";
+    const fallback = document.createElement("div");
+    fallback.style.cssText = `width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;color:#bbb;font-size:32px;`;
+    fallback.textContent = "🖼";
+    img.parentElement?.appendChild(fallback);
+  };
+
   return (
-    <Spin spinning={loading}>
+    <>
       {/* ========== 轮播图 ========== */}
       <div style={{ maxWidth: 1200, margin: "0 auto", marginBottom: 32 }}>
-        <Carousel autoplay effect="fade" dots={{ className: "banner-dots" }}>
-          {banners.length > 0 ? (
-            banners.map((b) => (
-              <div key={b.id}>
-                <div
-                  onClick={() => b.linkUrl && navigate(b.linkUrl)}
-                  style={{
-                    height: screens.md ? 400 : 200,
-                    background: `linear-gradient(135deg, #1F5FA8 0%, #0E3D75 100%)`,
-                    borderRadius: 12,
-                    overflow: "hidden",
-                    cursor: b.linkUrl ? "pointer" : "default",
-                    position: "relative",
-                  }}
-                >
-                  <img
-                    src={b.imageUrl}
-                    alt={b.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+        {loading ? (
+          <Skeleton.Image
+            active
+            style={{ width: "100%", height: screens.md ? 400 : 200 }}
+          />
+        ) : (
+          <Carousel autoplay effect="fade" dots={{ className: "banner-dots" }}>
+            {banners.length > 0 ? (
+              banners.map((b) => (
+                <div key={b.id}>
                   <div
+                    onClick={() => b.linkUrl && navigate(b.linkUrl)}
                     style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "40px 32px 24px",
-                      background:
-                        "linear-gradient(transparent, rgba(0,0,0,0.6))",
-                      color: "#fff",
+                      height: screens.md ? 400 : 200,
+                      background: `linear-gradient(135deg, #1F5FA8 0%, #0E3D75 100%)`,
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      cursor: b.linkUrl ? "pointer" : "default",
+                      position: "relative",
                     }}
                   >
-                    <Title level={3} style={{ color: "#fff", margin: 0 }}>
-                      {b.title}
-                    </Title>
+                    <img
+                      src={b.imageUrl}
+                      alt={b.title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: "40px 32px 24px",
+                        background:
+                          "linear-gradient(transparent, rgba(0,0,0,0.6))",
+                        color: "#fff",
+                      }}
+                    >
+                      <Title level={3} style={{ color: "#fff", margin: 0 }}>
+                        {b.title}
+                      </Title>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div>
+                <div
+                  style={{
+                    height: screens.md ? 400 : 200,
+                    background:
+                      "linear-gradient(135deg, #1F5FA8 0%, #0E3D75 100%)",
+                    borderRadius: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    color: "#fff",
+                  }}
+                >
+                  <Title level={1} style={{ color: "#fff", marginBottom: 8 }}>
+                    乌东文旅
+                  </Title>
+                  <Text
+                    style={{ color: "rgba(255,255,255,0.8)", fontSize: 18 }}
+                  >
+                    贵州雷山 · 苗族文化旅游平台
+                  </Text>
+                </div>
               </div>
-            ))
-          ) : (
-            <div>
-              <div
-                style={{
-                  height: screens.md ? 400 : 200,
-                  background:
-                    "linear-gradient(135deg, #1F5FA8 0%, #0E3D75 100%)",
-                  borderRadius: 12,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  color: "#fff",
-                }}
-              >
-                <Title level={1} style={{ color: "#fff", marginBottom: 8 }}>
-                  乌东文旅
-                </Title>
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 18 }}>
-                  贵州雷山 · 苗族文化旅游平台
-                </Text>
-              </div>
-            </div>
-          )}
-        </Carousel>
+            )}
+          </Carousel>
+        )}
       </div>
 
       {/* ========== 金刚区入口 ========== */}
@@ -287,304 +309,344 @@ export default function Home() {
       </div>
 
       {/* ========== 热门非遗好物 ========== */}
-      {hotProducts.length > 0 && (
-        <Section
-          title="热门非遗好物"
-          icon={<FireOutlined style={{ color: "#E85D2F" }} />}
-          moreLink="/clothing"
-        >
-          <Row gutter={[16, 16]}>
-            {hotProducts.slice(0, 4).map((p) => (
-              <Col key={p.id} xs={12} sm={8} md={6}>
-                <Card
-                  hoverable
-                  cover={
-                    <div
-                      style={{
-                        height: cardImgHeight,
-                        overflow: "hidden",
-                        background: "#f5f5f5",
-                      }}
-                    >
-                      <img
-                        alt={p.title}
-                        src={p.mainImage}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                  }
-                  onClick={() => navigate(`/clothing/${p.id}`)}
-                  style={{ borderRadius: 8 }}
-                >
-                  <Card.Meta
-                    title={<Text ellipsis>{p.title}</Text>}
-                    description={
-                      <Text type="danger" strong style={{ fontSize: 16 }}>
-                        ¥{p.price?.toFixed(2)}
-                      </Text>
-                    }
-                  />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Section>
-      )}
-
-      {/* ========== 苗乡美食 ========== */}
-      {restaurants.length > 0 && (
-        <Section
-          title="苗乡美食"
-          icon={<CoffeeOutlined style={{ color: "#6B8E3D" }} />}
-          moreLink="/dining"
-        >
-          <Row gutter={[16, 16]}>
-            {restaurants.map((r) => (
-              <Col key={r.id} xs={12} sm={8} md={6}>
-                <Card
-                  hoverable
-                  cover={
-                    <div
-                      style={{
-                        height: cardImgHeight,
-                        overflow: "hidden",
-                        background: "#f5f5f5",
-                      }}
-                    >
-                      <img
-                        alt={r.name}
-                        src={r.mainImage}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                  }
-                  onClick={() => navigate(`/dining/${r.id}`)}
-                  style={{ borderRadius: 8 }}
-                >
-                  <Card.Meta
-                    title={<Text ellipsis>{r.name}</Text>}
-                    description={
-                      <Space direction="vertical" size={2}>
-                        <Rate
-                          disabled
-                          defaultValue={r.rating}
-                          allowHalf
-                          style={{ fontSize: 14 }}
-                        />
-                        <Text
-                          type="secondary"
-                          ellipsis
-                          style={{ fontSize: 12 }}
-                        >
-                          {r.address}
-                        </Text>
-                      </Space>
-                    }
-                  />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Section>
-      )}
-
-      {/* ========== 吊脚楼民宿 ========== */}
-      {homestays.length > 0 && (
-        <Section
-          title="吊脚楼民宿"
-          icon={<HomeOutlined style={{ color: "#D4A14B" }} />}
-          moreLink="/homestay"
-        >
-          <Row gutter={[16, 16]}>
-            {homestays.map((h) => (
-              <Col key={h.id} xs={12} sm={8} md={6}>
-                <Card
-                  hoverable
-                  cover={
-                    <div
-                      style={{
-                        height: cardImgHeight,
-                        overflow: "hidden",
-                        background: "#f5f5f5",
-                      }}
-                    >
-                      <img
-                        alt={h.name}
-                        src={h.mainImage}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                  }
-                  onClick={() => navigate(`/homestay/${h.id}`)}
-                  style={{ borderRadius: 8 }}
-                >
-                  <Card.Meta
-                    title={<Text ellipsis>{h.name}</Text>}
-                    description={
-                      <Space direction="vertical" size={2}>
-                        <Rate
-                          disabled
-                          defaultValue={h.rating}
-                          allowHalf
-                          style={{ fontSize: 14 }}
-                        />
-                        <Text
-                          type="secondary"
-                          ellipsis
-                          style={{ fontSize: 12 }}
-                        >
-                          {h.address}
-                        </Text>
-                      </Space>
-                    }
-                  />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Section>
-      )}
-
-      {/* ========== 山水之旅 ========== */}
-      {scenicSpots.length > 0 && (
-        <Section
-          title="山水之旅"
-          icon={<EnvironmentOutlined style={{ color: "#1F5FA8" }} />}
-          moreLink="/travel"
-        >
-          <Row gutter={[16, 16]}>
-            {scenicSpots.map((s) => (
-              <Col key={s.id} xs={12} sm={8} md={6}>
-                <Card
-                  hoverable
-                  cover={
-                    <div
-                      style={{
-                        height: cardImgHeight,
-                        overflow: "hidden",
-                        background: "#f5f5f5",
-                      }}
-                    >
-                      <img
-                        alt={s.name}
-                        src={s.mainImage}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                  }
-                  onClick={() => navigate(`/travel/${s.id}`)}
-                  style={{ borderRadius: 8 }}
-                >
-                  <Card.Meta
-                    title={<Text ellipsis>{s.name}</Text>}
-                    description={
-                      <Paragraph
-                        ellipsis={{ rows: 2 }}
-                        type="secondary"
-                        style={{ fontSize: 12, margin: 0 }}
-                      >
-                        {s.description}
-                      </Paragraph>
-                    }
-                  />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Section>
-      )}
-
-      {/* ========== 社区精选 ========== */}
-      {posts.length > 0 && (
-        <Section
-          title="旅友精选"
-          icon={<StarOutlined style={{ color: "#8B5CF6" }} />}
-          moreLink="/community"
-        >
-          <Row gutter={[16, 16]}>
-            {posts.slice(0, 6).map((post) => {
-              const coverUrl = post.images?.split(",")[0] || post.coverImage;
-              return (
-                <Col key={post.id} xs={12} sm={8} md={4}>
+      <Section
+        title="热门非遗好物"
+        icon={<FireOutlined style={{ color: "#E85D2F" }} />}
+        moreLink="/clothing"
+      >
+        <Row gutter={[16, 16]}>
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Col key={i} xs={12} sm={8} md={6}>
+                  <Card style={{ borderRadius: 8 }}>
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </Card>
+                </Col>
+              ))
+            : hotProducts.slice(0, 4).map((p) => (
+                <Col key={p.id} xs={12} sm={8} md={6}>
                   <Card
                     hoverable
                     cover={
-                      coverUrl ? (
-                        <div
+                      <div
+                        style={{
+                          height: cardImgHeight,
+                          overflow: "hidden",
+                          background: "#f5f5f5",
+                        }}
+                      >
+                        <img
+                          alt={p.title}
+                          src={p.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
                           style={{
-                            height: 160,
-                            overflow: "hidden",
-                            background: "#f5f5f5",
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
                           }}
-                        >
-                          <img
-                            alt={post.title}
-                            src={coverUrl}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            height: 160,
-                            background:
-                              "linear-gradient(135deg, #E8F1FB, #f0f0f0)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <TeamOutlined
-                            style={{ fontSize: 32, color: "#1F5FA8" }}
-                          />
-                        </div>
-                      )
+                        />
+                      </div>
                     }
-                    onClick={() => navigate(`/community/${post.id}`)}
+                    onClick={() => navigate(`/clothing/${p.id}`)}
                     style={{ borderRadius: 8 }}
-                    bodyStyle={{ padding: 12 }}
                   >
-                    <Text
-                      ellipsis
-                      style={{ display: "block", fontWeight: 500 }}
-                    >
-                      {post.title}
-                    </Text>
-                    <Space size={12} style={{ marginTop: 8 }}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        ❤ {post.likeCount}
-                      </Text>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        👁 {post.viewCount}
-                      </Text>
-                    </Space>
+                    <Card.Meta
+                      title={<Text ellipsis>{p.title}</Text>}
+                      description={
+                        <Text type="danger" strong style={{ fontSize: 16 }}>
+                          ¥{p.price?.toFixed(2)}
+                        </Text>
+                      }
+                    />
                   </Card>
                 </Col>
-              );
-            })}
-          </Row>
-        </Section>
-      )}
+              ))}
+        </Row>
+      </Section>
+
+      {/* ========== 苗乡美食 ========== */}
+      <Section
+        title="苗乡美食"
+        icon={<CoffeeOutlined style={{ color: "#6B8E3D" }} />}
+        moreLink="/dining"
+      >
+        <Row gutter={[16, 16]}>
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Col key={i} xs={12} sm={8} md={6}>
+                  <Card style={{ borderRadius: 8 }}>
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </Card>
+                </Col>
+              ))
+            : restaurants.map((r) => (
+                <Col key={r.id} xs={12} sm={8} md={6}>
+                  <Card
+                    hoverable
+                    cover={
+                      <div
+                        style={{
+                          height: cardImgHeight,
+                          overflow: "hidden",
+                          background: "#f5f5f5",
+                        }}
+                      >
+                        <img
+                          alt={r.name}
+                          src={r.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                    }
+                    onClick={() => navigate(`/dining/${r.id}`)}
+                    style={{ borderRadius: 8 }}
+                  >
+                    <Card.Meta
+                      title={<Text ellipsis>{r.name}</Text>}
+                      description={
+                        <Space direction="vertical" size={2}>
+                          <Rate
+                            disabled
+                            defaultValue={r.rating}
+                            allowHalf
+                            style={{ fontSize: 14 }}
+                          />
+                          <Text
+                            type="secondary"
+                            ellipsis
+                            style={{ fontSize: 12 }}
+                          >
+                            {r.address}
+                          </Text>
+                        </Space>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+        </Row>
+      </Section>
+
+      {/* ========== 吊脚楼民宿 ========== */}
+      <Section
+        title="吊脚楼民宿"
+        icon={<HomeOutlined style={{ color: "#D4A14B" }} />}
+        moreLink="/homestay"
+      >
+        <Row gutter={[16, 16]}>
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Col key={i} xs={12} sm={8} md={6}>
+                  <Card style={{ borderRadius: 8 }}>
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </Card>
+                </Col>
+              ))
+            : homestays.map((h) => (
+                <Col key={h.id} xs={12} sm={8} md={6}>
+                  <Card
+                    hoverable
+                    cover={
+                      <div
+                        style={{
+                          height: cardImgHeight,
+                          overflow: "hidden",
+                          background: "#f5f5f5",
+                        }}
+                      >
+                        <img
+                          alt={h.name}
+                          src={h.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                    }
+                    onClick={() => navigate(`/homestay/${h.id}`)}
+                    style={{ borderRadius: 8 }}
+                  >
+                    <Card.Meta
+                      title={<Text ellipsis>{h.name}</Text>}
+                      description={
+                        <Space direction="vertical" size={2}>
+                          <Rate
+                            disabled
+                            defaultValue={h.rating}
+                            allowHalf
+                            style={{ fontSize: 14 }}
+                          />
+                          <Text
+                            type="secondary"
+                            ellipsis
+                            style={{ fontSize: 12 }}
+                          >
+                            {h.address}
+                          </Text>
+                        </Space>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+        </Row>
+      </Section>
+
+      {/* ========== 山水之旅 ========== */}
+      <Section
+        title="山水之旅"
+        icon={<EnvironmentOutlined style={{ color: "#1F5FA8" }} />}
+        moreLink="/travel"
+      >
+        <Row gutter={[16, 16]}>
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Col key={i} xs={12} sm={8} md={6}>
+                  <Card style={{ borderRadius: 8 }}>
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </Card>
+                </Col>
+              ))
+            : scenicSpots.map((s) => (
+                <Col key={s.id} xs={12} sm={8} md={6}>
+                  <Card
+                    hoverable
+                    cover={
+                      <div
+                        style={{
+                          height: cardImgHeight,
+                          overflow: "hidden",
+                          background: "#f5f5f5",
+                        }}
+                      >
+                        <img
+                          alt={s.name}
+                          src={s.mainImage}
+                          loading="lazy"
+                          onError={handleImgError}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+                    }
+                    onClick={() => navigate(`/travel/${s.id}`)}
+                    style={{ borderRadius: 8 }}
+                  >
+                    <Card.Meta
+                      title={<Text ellipsis>{s.name}</Text>}
+                      description={
+                        <Paragraph
+                          ellipsis={{ rows: 2 }}
+                          type="secondary"
+                          style={{ fontSize: 12, margin: 0 }}
+                        >
+                          {s.description}
+                        </Paragraph>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+        </Row>
+      </Section>
+
+      {/* ========== 社区精选 ========== */}
+      <Section
+        title="旅友精选"
+        icon={<StarOutlined style={{ color: "#8B5CF6" }} />}
+        moreLink="/community"
+      >
+        <Row gutter={[16, 16]}>
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <Col key={i} xs={12} sm={8} md={4}>
+                  <Card style={{ borderRadius: 8 }}>
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </Card>
+                </Col>
+              ))
+            : posts.slice(0, 6).map((post) => {
+                const coverUrl = post.images?.split(",")[0] || post.coverImage;
+                return (
+                  <Col key={post.id} xs={12} sm={8} md={4}>
+                    <Card
+                      hoverable
+                      cover={
+                        coverUrl ? (
+                          <div
+                            style={{
+                              height: 160,
+                              overflow: "hidden",
+                              background: "#f5f5f5",
+                            }}
+                          >
+                            <img
+                              alt={post.title}
+                              src={coverUrl}
+                              loading="lazy"
+                              onError={handleImgError}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              height: 160,
+                              background:
+                                "linear-gradient(135deg, #E8F1FB, #f0f0f0)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <TeamOutlined
+                              style={{ fontSize: 32, color: "#1F5FA8" }}
+                            />
+                          </div>
+                        )
+                      }
+                      onClick={() => navigate(`/community/${post.id}`)}
+                      style={{ borderRadius: 8 }}
+                      bodyStyle={{ padding: 12 }}
+                    >
+                      <Text
+                        ellipsis
+                        style={{ display: "block", fontWeight: 500 }}
+                      >
+                        {post.title}
+                      </Text>
+                      <Space size={12} style={{ marginTop: 8 }}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          ❤ {post.likeCount}
+                        </Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          👁 {post.viewCount}
+                        </Text>
+                      </Space>
+                    </Card>
+                  </Col>
+                );
+              })}
+        </Row>
+      </Section>
 
       {/* ========== 介绍横幅 ========== */}
       <div
@@ -607,7 +669,7 @@ export default function Home() {
           以及雷公山原始森林的壮美风光。
         </Text>
       </div>
-    </Spin>
+    </>
   );
 }
 

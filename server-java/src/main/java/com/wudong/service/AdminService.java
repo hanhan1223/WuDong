@@ -132,4 +132,14 @@ public interface AdminService {
      * 添加敏感词
      */
     SensitiveWord addSensitiveWord(String word, Integer level);
+
+    /**
+     * 获取退款列表
+     */
+    Page<Refund> getRefunds(RefundStatus status, Pageable pageable);
+
+    /**
+     * 审批退款
+     */
+    void approveRefund(Long refundId);
 }

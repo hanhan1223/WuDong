@@ -1,16 +1,17 @@
 package com.wudong.controller;
 
 import com.wudong.common.response.ApiResponse;
+import com.wudong.dto.cart.*;
 import com.wudong.entity.CartItem;
 import com.wudong.security.SecurityUtils;
 import com.wudong.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Tag(name = "购物车")
 @RestController
@@ -22,13 +23,9 @@ public class CartController {
 
     @Operation(summary = "添加商品到购物车")
     @PostMapping("/add")
-    public ApiResponse<CartItem> addToCart(@RequestBody Map<String, Object> body) {
+    public ApiResponse<CartItem> addToCart(@Valid @RequestBody AddToCartRequest request) {
         Long userId = SecurityUtils.getCurrentUserId();
-        Long productId = Long.valueOf(body.get("productId").toString());
-        Long skuId = body.get("skuId") != null ? Long.valueOf(body.get("skuId").toString()) : null;
-        Integer quantity = body.get("quantity") != null ? Integer.valueOf(body.get("quantity").toString()) : 1;
-
-        CartItem item = cartService.addToCart(userId, productId, skuId, quantity);
+        CartItem item = cartService.addToCart(userId, request.getProductId(), request.getSkuId(), request.getQuantity());
         return ApiResponse.success(item, "已添加到购物车");
     }
 
@@ -41,12 +38,9 @@ public class CartController {
 
     @Operation(summary = "更新购物车项数量")
     @PostMapping("/update")
-    public ApiResponse<CartItem> updateQuantity(@RequestBody Map<String, Object> body) {
+    public ApiResponse<CartItem> updateQuantity(@Valid @RequestBody UpdateCartRequest request) {
         Long userId = SecurityUtils.getCurrentUserId();
-        Long cartItemId = Long.valueOf(body.get("id").toString());
-        Integer quantity = Integer.valueOf(body.get("quantity").toString());
-
-        CartItem item = cartService.updateQuantity(cartItemId, userId, quantity);
+        CartItem item = cartService.updateQuantity(request.getId(), userId, request.getQuantity());
         return ApiResponse.success(item);
     }
 
@@ -68,20 +62,18 @@ public class CartController {
 
     @Operation(summary = "切换购物车项选中状态")
     @PostMapping("/select")
-    public ApiResponse<CartItem> toggleSelect(@RequestBody Map<String, Object> body) {
+    public ApiResponse<CartItem> toggleSelect(@Valid @RequestBody ToggleSelectRequest request) {
         Long userId = SecurityUtils.getCurrentUserId();
-        Long cartItemId = Long.valueOf(body.get("id").toString());
-        CartItem item = cartService.toggleSelect(cartItemId, userId);
+        CartItem item = cartService.toggleSelect(request.getId(), userId);
         return ApiResponse.success(item);
     }
 
     @Operation(summary = "全选/取消全选")
     @PostMapping("/select-all")
-    public ApiResponse<Void> toggleSelectAll(@RequestBody Map<String, Object> body) {
+    public ApiResponse<Void> toggleSelectAll(@Valid @RequestBody ToggleSelectAllRequest request) {
         Long userId = SecurityUtils.getCurrentUserId();
-        boolean selected = Boolean.parseBoolean(body.get("selected").toString());
-        cartService.toggleSelectAll(userId, selected);
-        return ApiResponse.success(null, selected ? "已全选" : "已取消全选");
+        cartService.toggleSelectAll(userId, request.getSelected());
+        return ApiResponse.success(null, request.getSelected() ? "已全选" : "已取消全选");
     }
 
     @Operation(summary = "获取选中的购物车项")

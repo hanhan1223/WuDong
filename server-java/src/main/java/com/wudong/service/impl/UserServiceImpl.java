@@ -119,6 +119,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 获取用户信息
      */
+    @Transactional(readOnly = true)
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("用户不存在", 404));
@@ -164,6 +165,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 管理员获取用户列表
      */
+    @Transactional(readOnly = true)
     public Page<User> getUsers(String keyword, Pageable pageable) {
         if (keyword != null && !keyword.isEmpty()) {
             return userRepository.findByNicknameContainingOrPhoneContaining(keyword, keyword, pageable);

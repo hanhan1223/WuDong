@@ -1,6 +1,7 @@
 package com.wudong.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wudong.common.constants.SecurityConstants;
 import com.wudong.common.response.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,51 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * 完全公开的路径（任意方法）
      */
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "/api/health",
-            "/api/users/register",
-            "/api/users/login",
-            "/api/users/send-sms",
-            "/api/users/login-sms",
-            "/api/admin/login"
-    );
+    private static final List<String> PUBLIC_PATHS = SecurityConstants.PUBLIC_ENDPOINTS;
 
     /**
      * 仅 GET 公开的路径（浏览端点）
      */
-    private static final List<String> PUBLIC_GET_PATHS = List.of(
-            "/api/products",
-            "/api/products/hot",
-            "/api/products/categories",
-            "/api/products/*",
-            "/api/restaurants",
-            "/api/restaurants/*",
-            "/api/restaurants/*/dishes",
-            "/api/restaurants/*/timeslots",
-            "/api/farm/categories",
-            "/api/farm/products",
-            "/api/farm/products/*",
-            "/api/homestays",
-            "/api/homestays/*",
-            "/api/homestays/*/rooms",
-            "/api/homestays/rooms/*/calendar",
-            "/api/scenic-spots",
-            "/api/scenic-spots/*",
-            "/api/scenic-spots/*/tickets",
-            "/api/routes",
-            "/api/routes/*",
-            "/api/transport-guides",
-            "/api/e-tickets/*",
-            "/api/posts",
-            "/api/posts/*",
-            "/api/posts/*/comments",
-            "/api/topics",
-            "/api/search",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/api-docs/**",
-            "/v3/api-docs/**"
-    );
+    private static final List<String> PUBLIC_GET_PATHS = SecurityConstants.PUBLIC_GET_ENDPOINTS;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -135,6 +97,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 检查路径是否是公开路径（区分 HTTP 方法）
      */
     private boolean isPublicPath(String path, String method) {
+        // Swagger 路径
+        for (String pattern : SecurityConstants.SWAGGER_PATHS) {
+            if (pathMatcher.match(pattern, path)) {
+                return true;
+            }
+        }
+
         // 完全公开的路径
         for (String pattern : PUBLIC_PATHS) {
             if (pathMatcher.match(pattern, path)) {

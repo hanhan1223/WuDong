@@ -20,7 +20,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.status = 'NORMAL' AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%)")
     Page<Post> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT p FROM Post p WHERE p.status = 'NORMAL' AND p.topicIds LIKE %:topicId%")
+    @Query("SELECT p FROM Post p WHERE p.status = 'NORMAL' AND " +
+           "CONCAT(',', p.topicIds, ',') LIKE CONCAT('%,:topicId,%')")
     Page<Post> findByTopicId(@Param("topicId") String topicId, Pageable pageable);
 
     long countByStatus(PostStatus status);

@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/github-mcp-server"]
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "Bash(npm test:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ],
+    "deny": ["Bash(rm -rf:*)", "Edit(.env*)", "Edit(*.pem)", "Edit(*.key)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" =~ \\.(env|pem|key)$ ]]; then echo '❌ 禁止编辑敏感文件' && exit 1; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd $CLAUDE_PROJECT_DIR && npx prettier --write \"$CLAUDE_FILE_PATH\" 2>/dev/null || true",
+            "timeout": 30000
+          }
+        ]
+      }
+    ]
+  }
+}
