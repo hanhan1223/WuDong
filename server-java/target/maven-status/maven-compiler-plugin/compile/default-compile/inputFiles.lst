@@ -30,6 +30,7 @@ C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\ja
 C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\repository\FollowRepository.java
 C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\controller\HealthController.java
 C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\common\response\ApiResponse.java
+C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\dto\payment\PaymentCallbackRequest.java
 C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\entity\ProductSku.java
 C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\service\impl\CartServiceImpl.java
 C:\Users\ipsa\Desktop\实验\系统设计\乌冬村\code\server-java\src\main\java\com\wudong\entity\Payment.java

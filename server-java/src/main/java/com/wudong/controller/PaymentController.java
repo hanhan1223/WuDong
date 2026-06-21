@@ -3,6 +3,7 @@ package com.wudong.controller;
 import com.wudong.common.response.ApiResponse;
 import com.wudong.dto.payment.ApplyRefundRequest;
 import com.wudong.dto.payment.CreatePaymentRequest;
+import com.wudong.dto.payment.PaymentCallbackRequest;
 import com.wudong.entity.Payment;
 import com.wudong.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,8 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Tag(name = "支付")
 @RestController
@@ -30,11 +29,8 @@ public class PaymentController {
 
     @Operation(summary = "支付成功回调")
     @PostMapping("/callback")
-    public ApiResponse<Void> payCallback(@RequestBody Map<String, String> body) {
-        paymentService.handlePaySuccess(
-                Long.valueOf(body.get("orderId")),
-                body.get("tradeNo"),
-                body.get("method"));
+    public ApiResponse<Void> payCallback(@Valid @RequestBody PaymentCallbackRequest request) {
+        paymentService.handlePaySuccess(request.getOrderId(), request.getTradeNo(), request.getMethod());
         return ApiResponse.success(null, "支付成功");
     }
 

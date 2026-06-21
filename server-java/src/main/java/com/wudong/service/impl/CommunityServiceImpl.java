@@ -77,8 +77,8 @@ public class CommunityServiceImpl implements CommunityService {
     @Transactional
     public Post createPost(Long userId, String title, String content, List<String> images, String videoUrl,
                             Long locationId, String locationType, String locationName, List<Long> topicIds) {
-        // 内容审核
-        boolean approved = moderationService.moderateContent(title + " " + content);
+        // 内容审核（含自动禁言）
+        boolean approved = moderationService.moderateContentWithUser(title + " " + content, userId);
         if (!approved) {
             throw new BusinessException("内容包含敏感信息，无法发布");
         }
@@ -112,8 +112,8 @@ public class CommunityServiceImpl implements CommunityService {
             throw new BusinessException("无权操作此帖子", 403);
         }
 
-        // 内容审核
-        boolean approved = moderationService.moderateContent(title + " " + content);
+        // 内容审核（含自动禁言）
+        boolean approved = moderationService.moderateContentWithUser(title + " " + content, userId);
         if (!approved) {
             throw new BusinessException("内容包含敏感信息，无法发布");
         }
@@ -225,8 +225,8 @@ public class CommunityServiceImpl implements CommunityService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException("帖子不存在", 404));
 
-        // 内容审核
-        boolean approved = moderationService.moderateContent(content);
+        // 内容审核（含自动禁言）
+        boolean approved = moderationService.moderateContentWithUser(content, userId);
         if (!approved) {
             throw new BusinessException("评论包含敏感信息，无法发布");
         }

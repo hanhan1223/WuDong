@@ -6,6 +6,7 @@ import com.wudong.entity.*;
 import com.wudong.repository.*;
 import com.wudong.security.JwtTokenProvider;
 import com.wudong.service.AdminService;
+import com.wudong.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,8 @@ public class AdminServiceImpl implements AdminService {
     private final OperationLogRepository operationLogRepository;
     private final MerchantApplicationRepository merchantApplicationRepository;
     private final PostRepository postRepository;
+    private final RefundRepository refundRepository;
+    private final PaymentService paymentService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -327,5 +330,25 @@ public class AdminServiceImpl implements AdminService {
         sensitiveWord.setLevel(level != null ? level : 1);
         sensitiveWord.setStatus(true);
         return sensitiveWordRepository.save(sensitiveWord);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Refund> getRefunds(RefundStatus status, Pageable pageable) {
+        if (status != null) {
+            return refundRepository.findByStatus(status, pageable);
+        }
+        return refundRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional
+    public void approveRefund(Long refundId) {
+        Refund refund = refundRepository.findById(refundId)
+                .orElseThrow(() -> new BusinessException("退款记录不存在", 404));
+        if (refund.getStatus() != RefundStatus.PENDING) {
+            throw new BusinessException("该退款不在待审批状态");
+        }
+        paymentService.handleRefundSuccess(refund.getOrder().getId());
     }
 }

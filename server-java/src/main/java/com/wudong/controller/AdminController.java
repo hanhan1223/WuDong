@@ -97,6 +97,22 @@ public class AdminController {
         return ApiResponse.success(null, "结算成功");
     }
 
+    @Operation(summary = "获取退款列表")
+    @GetMapping("/refunds")
+    public ApiResponse<Page<Refund>> getRefunds(
+            @RequestParam(required = false) RefundStatus status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        return ApiResponse.success(adminService.getRefunds(status, PageRequest.of(page - 1, pageSize)));
+    }
+
+    @Operation(summary = "审批退款")
+    @PostMapping("/refunds/{id}/approve")
+    public ApiResponse<Void> approveRefund(@PathVariable Long id) {
+        adminService.approveRefund(id);
+        return ApiResponse.success(null, "退款已批准");
+    }
+
     @Operation(summary = "获取举报列表")
     @GetMapping("/reports")
     public ApiResponse<Page<Report>> getReports(

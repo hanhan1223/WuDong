@@ -95,6 +95,7 @@ com\wudong\dto\admin\CreateBannerRequest.class
 com\wudong\controller\TravelController.class
 com\wudong\service\OrderService$OrderItemData.class
 com\wudong\controller\PaymentController.class
+com\wudong\dto\payment\PaymentCallbackRequest.class
 com\wudong\entity\TicketType.class
 com\wudong\dto\user\SendSmsRequest.class
 com\wudong\dto\order\CreateOrderRequest.class
