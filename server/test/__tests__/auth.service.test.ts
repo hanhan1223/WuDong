@@ -1,5 +1,5 @@
-import { AuthService } from "../service/auth.service";
-import { UserService } from "../service/user.service";
+import { AuthService } from "../../src/service/auth.service";
+import { UserService } from "../../src/service/user.service";
 import { JwtService } from "@midwayjs/jwt";
 
 describe("AuthService", () => {

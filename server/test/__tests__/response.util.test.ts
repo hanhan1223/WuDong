@@ -1,4 +1,4 @@
-import { ResponseUtil } from "../common/types/response";
+import { ResponseUtil } from "../../src/common/types/response";
 
 describe("ResponseUtil", () => {
   describe("success", () => {

@@ -1,5 +1,9 @@
-import { RegisterDTO, LoginDTO, ChangePasswordDTO } from "../dto/user.dto";
-import { CreateOrderDTO, CancelOrderDTO } from "../dto/order.dto";
+import {
+  RegisterDTO,
+  LoginDTO,
+  ChangePasswordDTO,
+} from "../../src/dto/user.dto";
+import { CreateOrderDTO, CancelOrderDTO } from "../../src/dto/order.dto";
 
 /**
  * DTO 验证测试

@@ -24,7 +24,7 @@ export class RateLimitMiddleware implements IMiddleware<Context, NextFunction> {
 
       // 根据接口类型选择限流配置
       let maxRequests = RateLimitMiddleware.DEFAULT_MAX_REQUESTS;
-      let windowMs = RateLimitMiddleware.DEFAULT_WINDOW_MS;
+      const windowMs = RateLimitMiddleware.DEFAULT_WINDOW_MS;
 
       if (path.includes("/login")) {
         maxRequests = RateLimitMiddleware.LOGIN_MAX_REQUESTS;
