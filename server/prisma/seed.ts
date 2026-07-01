@@ -33,7 +33,7 @@ async function main() {
   });
   console.log("✅ 默认管理员创建完成 (admin / admin123456)");
 
-  // 3. 商品分类
+  // 3. 商品分类（幂等：已存在则跳过）
   const categories = [
     "苗族银饰",
     "蜡染制品",
@@ -41,14 +41,16 @@ async function main() {
     "民族服饰",
     "特色食品",
   ];
-  for (const name of categories) {
-    await prisma.productCategory.create({
-      data: { name, sort: categories.indexOf(name) + 1, status: true },
+  for (let i = 0; i < categories.length; i++) {
+    await prisma.productCategory.upsert({
+      where: { id: i + 1 },
+      update: {},
+      create: { name: categories[i], sort: i + 1, status: true },
     });
   }
   console.log("✅ 商品分类创建完成");
 
-  // 4. 农产品分类
+  // 4. 农产品分类（幂等）
   const farmCategories = [
     "时令蔬菜",
     "山野干货",
@@ -56,14 +58,16 @@ async function main() {
     "蜂蜜花茶",
     "米酒饮品",
   ];
-  for (const name of farmCategories) {
-    await prisma.farmCategory.create({
-      data: { name, sort: farmCategories.indexOf(name) + 1, status: true },
+  for (let i = 0; i < farmCategories.length; i++) {
+    await prisma.farmCategory.upsert({
+      where: { id: i + 1 },
+      update: {},
+      create: { name: farmCategories[i], sort: i + 1, status: true },
     });
   }
   console.log("✅ 农产品分类创建完成");
 
-  // 5. 话题
+  // 5. 话题（幂等：按名称 upsert）
   const topics = [
     {
       name: "#乌东苗寨探秘#",
@@ -85,7 +89,11 @@ async function main() {
     { name: "#苗族节庆#", description: "记录苗年、吃新节等传统节庆活动" },
   ];
   for (const topic of topics) {
-    await prisma.topic.create({ data: { ...topic, status: true } });
+    await prisma.topic.upsert({
+      where: { name: topic.name },
+      update: {},
+      create: { ...topic, status: true },
+    });
   }
   console.log("✅ 话题创建完成");
 
@@ -109,11 +117,13 @@ async function main() {
   }
   console.log("✅ 系统配置创建完成");
 
-  // 7. 敏感词
+  // 7. 敏感词（幂等：按词 upsert）
   const words = ["赌博", "色情", "毒品", "暴力", "诈骗"];
   for (const word of words) {
-    await prisma.sensitiveWord.create({
-      data: { word, level: 3, status: true },
+    await prisma.sensitiveWord.upsert({
+      where: { word },
+      update: {},
+      create: { word, level: 3, status: true },
     });
   }
   console.log("✅ 敏感词创建完成");

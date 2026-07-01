@@ -104,6 +104,9 @@ export class OrderController {
   @ApiOperation({ summary: "确认订单（商家）" })
   async confirmOrder(ctx: Context, @Param("id") id: string) {
     const user = ctx.state.user as IUserContext;
+    if (user.role !== "MERCHANT" && user.role !== "ADMIN") {
+      return ResponseUtil.error("仅商家可确认订单", 403);
+    }
     const orderId = parseInt(id, 10);
     const order = await this.orderService.findById(orderId);
     if (!order) return ResponseUtil.error("订单不存在", 404);

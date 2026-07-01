@@ -12,6 +12,9 @@ RUN npm run build
 # 生产阶段
 FROM node:20-alpine
 
+# wget 用于健康检查
+RUN apk add --no-cache wget
+
 WORKDIR /app
 
 COPY --from=builder /app/package*.json ./

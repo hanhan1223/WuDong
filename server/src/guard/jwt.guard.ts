@@ -1,72 +1,75 @@
 import { Guard, IGuard, MidwayError } from "@midwayjs/core";
 import { Context } from "@midwayjs/koa";
 import * as jwt from "jsonwebtoken";
+import "reflect-metadata";
 import { JwtPayload } from "../interface";
-
-/** 不需要鉴权的公开路径（POST 登录/注册） */
-const PUBLIC_POST_PATHS = [
-  "/api/users/login",
-  "/api/users/register",
-  "/api/admin/login",
-];
-
-/** GET 请求公开的路径前缀（浏览类接口） */
-const PUBLIC_GET_PREFIXES = [
-  "/api/health",
-  "/api/products",
-  "/api/restaurants",
-  "/api/farm",
-  "/api/homestays",
-  "/api/scenic-spots",
-  "/api/routes",
-  "/api/transport-guides",
-  "/api/e-tickets",
-  "/api/posts",
-  "/api/topics",
-];
-
-/** JWT 密钥（与 config 保持一致） */
-const JWT_SECRET = process.env.JWT_SECRET || "dev-only-wudong-jwt-secret";
+import { PUBLIC_KEY } from "../decorator/public.decorator";
 
 /**
  * JWT 鉴权守卫
+ * 优先级：
+ * 1. Swagger 文档路径 → 放行
+ * 2. 方法上有 @Public() 装饰器 → 放行
+ * 3. 请求头有合法 Bearer Token → 放行
+ * 4. 否则 → 拒绝
  */
 @Guard()
 export class JwtGuard implements IGuard {
-  async canActivate(ctx: Context): Promise<boolean> {
-    // Swagger 文档放行
+  async canActivate(
+    ctx: Context,
+    clz: new (...args: any[]) => any,
+    methodName: string,
+  ): Promise<boolean> {
+    // 1. Swagger 文档放行
     if (ctx.path.startsWith("/swagger") || ctx.path.startsWith("/doc")) {
       return true;
     }
 
-    // POST 登录/注册接口放行
-    if (
-      ctx.method === "POST" &&
-      PUBLIC_POST_PATHS.some((p) => ctx.path === p)
-    ) {
-      return true;
+    // 2. 检查 @Public() 装饰器（通过 Reflect 元数据）
+    if (clz && methodName) {
+      const metadata = Reflect.getMetadata(PUBLIC_KEY, clz);
+      if (metadata && methodName in metadata) {
+        return true;
+      }
     }
 
-    // GET 请求的公开浏览接口放行
+    // 2b. 兜底：常用公开路径前缀（兼容 clz/methodName 不可用的场景）
+    const PUBLIC_PREFIXES = [
+      "/api/health",
+      "/api/products",
+      "/api/restaurants",
+      "/api/farm",
+      "/api/homestays",
+      "/api/scenic-spots",
+      "/api/routes",
+      "/api/transport-guides",
+      "/api/e-tickets",
+      "/api/posts",
+      "/api/topics",
+      "/api/search",
+    ];
     if (
       ctx.method === "GET" &&
-      PUBLIC_GET_PREFIXES.some((p) => ctx.path.startsWith(p))
+      PUBLIC_PREFIXES.some((p) => ctx.path.startsWith(p))
     ) {
       return true;
     }
 
-    // 从 Header 获取 Token
+    // 3. 从 Header 获取 Token 并验证
     const authHeader = ctx.headers.authorization;
     const token = authHeader?.startsWith("Bearer ")
       ? authHeader.slice(7)
       : null;
+
     if (!token) {
       throw new MidwayError("请先登录", "UNAUTHORIZED");
     }
 
     try {
-      // 直接用 jsonwebtoken 验证
-      const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+      const payload = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "wudong-tourism-jwt-secret-2026",
+      ) as JwtPayload;
 
       // 将用户信息挂载到 ctx.state
       ctx.state.user = {
@@ -76,7 +79,7 @@ export class JwtGuard implements IGuard {
       };
 
       return true;
-    } catch (err) {
+    } catch (_err) {
       throw new MidwayError("登录已过期，请重新登录", "UNAUTHORIZED");
     }
   }
