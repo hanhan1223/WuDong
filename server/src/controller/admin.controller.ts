@@ -307,13 +307,10 @@ export class AdminController {
     return ResponseUtil.success(null, "处理完成");
   }
 
+  @Public()
   @Get("/announcements")
   @ApiOperation({ summary: "公告列表" })
-  async getAnnouncements(ctx: Context) {
-    const user = ctx.state.user as IUserContext;
-    if (user.role !== "ADMIN") {
-      return ResponseUtil.error("无权访问", 403);
-    }
+  async getAnnouncements() {
     const list = await this.adminService.findAnnouncements();
     return ResponseUtil.success(list);
   }
@@ -329,13 +326,10 @@ export class AdminController {
     return ResponseUtil.success(announcement, "创建成功");
   }
 
+  @Public()
   @Get("/banners")
   @ApiOperation({ summary: "轮播图列表" })
-  async getBanners(ctx: Context) {
-    const user = ctx.state.user as IUserContext;
-    if (user.role !== "ADMIN") {
-      return ResponseUtil.error("无权访问", 403);
-    }
+  async getBanners() {
     const list = await this.adminService.findBanners();
     return ResponseUtil.success(list);
   }

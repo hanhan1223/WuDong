@@ -76,12 +76,21 @@ export class AuthService {
     // 清除验证码
     await this.cacheService.del(`sms:${phone}`);
 
-    // 查找或创建用户
+    // 查找或创建用户（SMS 登录自动注册）
     let user = await this.userService.findByPhone(phone);
     if (!user) {
+      // SMS 注册用户设置随机密码（不可用于密码登录），可通过忘记密码重置
+      const randomPwd = await require("bcryptjs").hash(
+        Math.random().toString(36).slice(2),
+        10,
+      );
       user = await this.prisma.user.create({
-        data: { phone, password: "", nickname: `用户${phone.slice(-4)}` },
-      } as any);
+        data: {
+          phone,
+          password: randomPwd,
+          nickname: `用户${phone.slice(-4)}`,
+        },
+      });
     }
 
     if (user.status !== "ACTIVE") throw new Error("账号已被禁用");

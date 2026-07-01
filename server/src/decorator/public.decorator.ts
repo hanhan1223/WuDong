@@ -1,11 +1,11 @@
+import { createCustomMethodDecorator } from "@midwayjs/core";
+
 /**
- * 标记接口为公开访问（文档用途）
- * 实际鉴权逻辑在 JwtGuard 中通过路径匹配实现
+ * 标记接口为公开访问（无需 JWT Token）
+ * 会在 JwtGuard 中被检查
  */
-export const PUBLIC_KEY = "Public";
-export const Public = () => {
-  return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
-    // 仅作标记，不做实际处理
-    return descriptor;
-  };
-};
+export const PUBLIC_KEY = "decorator:public";
+
+export function Public(): MethodDecorator {
+  return createCustomMethodDecorator(PUBLIC_KEY, {});
+}

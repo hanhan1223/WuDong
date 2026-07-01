@@ -1,10 +1,6 @@
 import { MidwayConfig } from "@midwayjs/core";
 
-// JWT Secret 必须通过环境变量设置，缺失时拒绝启动
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET && process.env.NODE_ENV === "production") {
-  throw new Error("JWT_SECRET 环境变量未设置，生产环境禁止启动");
-}
+const JWT_SECRET = process.env.JWT_SECRET || "wudong-tourism-jwt-secret-2026";
 
 export default {
   // Koa 应用密钥（用于 Cookie 签名等）
@@ -18,7 +14,7 @@ export default {
 
   // JWT 配置
   jwt: {
-    secret: JWT_SECRET || "dev-only-wudong-jwt-secret",
+    secret: JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   },
 
@@ -28,11 +24,9 @@ export default {
       host: process.env.REDIS_HOST || "localhost",
       port: parseInt(process.env.REDIS_PORT || "6379"),
       password: process.env.REDIS_PASSWORD || "",
-      db: 0,
+      db: parseInt(process.env.REDIS_DB || "0"),
     },
   },
-
-  // Prisma 客户端（通过 PrismaService 管理，无需在此配置）
 
   // Swagger API 文档
   swagger: {

@@ -17,6 +17,7 @@ import { MessageService } from "../service/message.service";
 import { AddressService } from "../service/address.service";
 import { ResponseUtil } from "../common/types/response";
 import { IUserContext } from "../interface";
+import { Public } from "../decorator/public.decorator";
 import { PAGINATION } from "../common/constants";
 import {
   CreateReviewDTO,
@@ -52,6 +53,7 @@ export class CommonController {
     return ResponseUtil.success(review, "评价成功");
   }
 
+  @Public()
   @Get("/reviews")
   @ApiOperation({ summary: "获取评价列表" })
   async getReviewList(
